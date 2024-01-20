@@ -1,0 +1,20 @@
+﻿@inject University.Web.Services.Contracts.ISessionService SessionService
+
+@{
+    ViewData["Title"] = "Home Page";
+
+    bool authorized = SessionService.isAuthorized;
+    var user = SessionService.GetUser();
+}
+
+<div class="text-center">
+    @if (authorized)
+    {
+        <h1 class="display-4">Welcome, @user.FirstName!</h1>
+    }
+    else
+    {
+        <h1 class="display-4">Welcome</h1>
+    }
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>

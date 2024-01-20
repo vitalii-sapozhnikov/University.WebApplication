@@ -1,0 +1,97 @@
+﻿@model UploadPublication
+
+<form asp-controller="Publications" asp-action="Upload" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Abstract"></label>
+        <textarea asp-for="Abstract" class="form-control"></textarea>
+        <span asp-validation-for="Abstract" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Keywords"></label>
+        <input asp-for="Keywords" class="form-control" />
+        <span asp-validation-for="Keywords" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Authors"></label>
+        <input asp-for="Authors" id="Authors" class="form-control" />
+        <span asp-validation-for="Authors" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="File"></label>
+        <input asp-for="File" class="form-control" />
+        <span asp-validation-for="File" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PublicationDate"></label>
+        <input asp-for="PublicationDate" class="form-control" />
+        <span asp-validation-for="PublicationDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
+<script>
+    $(function () {
+        var getAuthorsUrl = "/api/Authors/GetAuthors"; // Adjust the URL to your actual endpoint
+
+        function split(val) {
+            return val.split(/,\s*/);
+        }
+
+        function extractLast(term) {
+            var terms = split(term);
+            return terms.length === 1 ? terms[0] : terms.pop();
+        }
+
+        $("#Authors")
+            .on("keydown", function (event) {
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete("instance").menu.active) {
+                    event.preventDefault();
+                }
+            })
+            .autocomplete({
+                minLength: 3,
+                source: function (request, response) {
+                    $.ajax({
+                        url: getAuthorsUrl,
+                        data: { term: extractLast(request.term) }, // Use extractLast to get the correct term
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                focus: function () {
+                    return false;
+                },
+                select: function (event, ui) {
+                    var terms = split(this.value);
+                    terms.pop();
+                    terms.push(ui.item.value);
+                    terms.push("");
+                    this.value = terms.join(", ");
+                    return false;
+                }
+            });
+    });
+</script>
