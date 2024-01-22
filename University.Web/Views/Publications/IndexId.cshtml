@@ -1,0 +1,55 @@
+﻿@model University.WebApi.Models.Publication
+
+@{
+    ViewData["Title"] = "Publication Details";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@Model.Title</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Дата публікації:</strong> @Model.PublicationDate.ToShortDateString()</p>
+            <p><strong>Автори:</strong> @string.Join(", ", Model.Authors.Select(a => $"{a.LastName} {a.FirstName} {a.MiddleName}"))</p>
+            @* <p><strong>Uploaded By:</strong> @Model.User.UserName</p> *@
+        </div>
+
+        <div class="col-md-6">
+            <a asp-action="DownloadFile" 
+                asp-controller="Publications"
+                asp-route-id="@Model.CloudStorageGuid"
+                class="text-primary"
+                target="_blank">
+                Завантажити
+            </a>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Анотація</h4>
+            <p>@Model.Abstract</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h4>Опис</h4>
+            <p>@Model.Description</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h4>Ключові слова</h4>
+            <ul class="list-inline">
+                @foreach (var keyword in Model.Keywords)
+                {
+                    <li class="list-inline-item"><span style="font-size: 0.9rem;" class="badge bg-primary">@keyword</span></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

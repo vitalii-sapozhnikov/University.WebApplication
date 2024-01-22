@@ -9,6 +9,7 @@ namespace University.Web.Services.Contracts
         string GetBearerToken();
         ApplicationUser GetUser();
         void RemoveBearerToken();
+        void RemoveUser();
         void SetBearerToken(string token);
         void SetUser(ApplicationUser userInfo);
     }

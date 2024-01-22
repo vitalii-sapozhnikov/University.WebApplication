@@ -56,5 +56,11 @@ namespace University.Web.Services
             //return _cookieService.GetBearerToken();
             return _sessionService.GetBearerToken();
         }
+
+        public void Logout()
+        {
+            _sessionService.RemoveBearerToken();
+            _sessionService.RemoveUser();
+        }
     }
 }

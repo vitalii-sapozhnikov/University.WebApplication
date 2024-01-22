@@ -6,5 +6,6 @@ namespace University.Web.Services
     {
         string GetAccessToken();
         Task<(bool success, string? error)> Login(LoginUser user);
+        void Logout();
     }
 }

@@ -47,10 +47,27 @@ namespace University.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<string> GetWeatherForecast() 
+        public IActionResult Logout()
         {
-            return await _apiService.GetWeatherForecast();
+            _authService.Logout();
+            return RedirectToAction("Index", "Home");
         }
 
+        [HttpGet]
+        public IActionResult Register()
+        {
+            RegisterUserDto userDto = new RegisterUserDto();
+            return View(userDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterUserDto model)
+        {
+            if (ModelState.IsValid)
+            {
+
+            }
+            return View(model);
+        }
     }
 }

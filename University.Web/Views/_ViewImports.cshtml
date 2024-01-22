@@ -1,5 +1,7 @@
 ﻿@using University.Web
 @using Models.Dtos
 @using Models.Models
-@using Models.Dtos.WebApp
+@using University.Web.Models.Post
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject University.Web.Services.Contracts.ISessionService SessionService
+

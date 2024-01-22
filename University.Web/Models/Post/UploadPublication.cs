@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Dtos.WebApp
+namespace University.Web.Models.Post
 {
     public class UploadPublication
     {
@@ -34,6 +34,6 @@ namespace Models.Dtos.WebApp
         public IFormFile File { get; set; }
 
         [Display(Name = "Дата публікації")]
-        public DateTime? PublicationDate { get; set; }        
+        public DateTime? PublicationDate { get; set; }
     }
 }

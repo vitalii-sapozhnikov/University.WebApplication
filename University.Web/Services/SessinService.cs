@@ -42,6 +42,11 @@ namespace University.Web.Services
         {
             return _httpContextAccessor.HttpContext.Session.GetObject<ApplicationUser>(CurrentUserSessionKey);
         }
+
+        public void RemoveUser()
+        {
+            _httpContextAccessor.HttpContext.Session.RemoveObject(CurrentUserSessionKey);
+        }
     }
 
     public static class SessionExtensions
@@ -55,6 +60,10 @@ namespace University.Web.Services
         {
             var value = session.GetString(key);
             return value == null ? default : JsonConvert.DeserializeObject<T>(value);
+        }
+        public static void RemoveObject(this ISession session, string key)
+        {
+            session.Remove(key);
         }
     }
 

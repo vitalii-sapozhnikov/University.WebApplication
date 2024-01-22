@@ -26,9 +26,75 @@ namespace University.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(
+            string? searchTerm,
+            string? authorName,
+            DateTime? startDateFilter,
+            DateTime? endDateFilter)
         {
-            return Ok();
+            IQueryable<Publication> query = _appDbContext.Publications.Include(p => p.Authors);
+
+            // Apply filters based on the provided parameters
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                // Fuzzy search for Title, Description, Abstract, and Keywords
+                query = query.Where(p =>
+                    EF.Functions.Like(p.Title.ToLower(), $"%{searchTerm.ToLower()}%") ||
+                    EF.Functions.Like(p.Description.ToLower(), $"%{searchTerm.ToLower()}%") ||
+                    EF.Functions.Like(p.Abstract.ToLower(), $"%{searchTerm.ToLower()}%") ||
+                    p.Keywords.Any(k => EF.Functions.Like(k.ToLower(), $"%{searchTerm.ToLower()}%")));
+
+            }
+
+            if (!string.IsNullOrEmpty(authorName))
+            {
+                // Filter by Author name
+                query = query.Where(p => p.Authors
+                    .Any(a => EF.Functions
+                    .Like($"{a.LastName} {a.FirstName} {a.MiddleName}", $"%{authorName}%")));
+            }
+
+            if (startDateFilter.HasValue)
+            {
+                query = query.Where(p => p.PublicationDate >= startDateFilter.Value.Date);
+            }
+
+            if (endDateFilter.HasValue)
+            {
+                query = query.Where(p => p.PublicationDate <= endDateFilter.Value.Date);
+            }
+
+            var publicationShortDtos = await query
+                .Take(100)
+                .Select(item => new PublicationShortDto
+                {
+                    PublicationId = item.PublicationId,
+                    Title = item.Title,
+                    PublicationDate = item.PublicationDate,
+                    Description = item.Description,
+                    Keywords = item.Keywords,
+                    Authors = item.Authors
+                })
+                .ToListAsync();
+
+            return Ok(publicationShortDtos);
+        }
+
+
+
+        [HttpGet]
+        [Route("info/{idx}")]
+        public async Task<IActionResult> GetInfo(int idx)
+        {
+            var publication = await _appDbContext.Publications
+                .Include(p => p.Authors)
+                .FirstOrDefaultAsync(p => p.PublicationId == idx);
+
+            if(publication != null)
+            {
+                return Ok(publication);
+            }
+            return NotFound();
         }
 
         [Authorize]

@@ -1,5 +1,163 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model List<PublicationShortDto>
+
+<style>
+    .publication-title {
+        font-size: 18px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .publication-title:hover {
+        text-decoration: underline; /* Underline on hover */
+    }
+
+    .author-list {
+        text-decoration: none;
+        font-size: 0.95rem;
+
+        white-space: nowrap;
+        display: inline-block; /* Ensure it respects nowrap property */
+        color: #d63384;
+        word-wrap: break-word;
+        font-family: var(--bs-font-monospace);
+        direction: ltr;
+        unicode-bidi: bidi-override;
+    }
+
+    .author-list:hover {
+        text-decoration: underline;
+        color: #d63384;
+    }
+
+    .comma {
+        color: #d63384; /* Comma color */
+    }
+
+    .publication-description{
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Limit to two lines */
+        -webkit-box-orient: vertical;
+
+        margin-bottom: .3rem;
+    }
+
+    .publication-keywords{
+        white-space: nowrap;
+        display: inline-block; /* Ensure it respects nowrap property */
+        font-size: .875em;
+        color: #d63384;
+        word-wrap: break-word;
+        font-family: var(--bs-font-monospace);
+        direction: ltr;
+        unicode-bidi: bidi-override;
+    }
+
+    .publication-keywords:hover{
+        text-decoration: underline;
+    }
+</style>
+
+<div class="d-flex justify-content-between">
+    <h3>Публікації</h3>
+    <a asp-controller="Publications" 
+        asp-action="Upload" 
+        class="btn btn-primary">
+        Опублікувати
+    </a>
+</div>
+<hr />
+
+<!-- Search Form -->
+<form id="searchForm" asp-action="All" asp-controller="Publications" method="get" class="mb-3">
+    
+    <div class="mb-3">
+        <label for="searchTerm" class="form-label">Пошук:</label>
+        <input type="text" class="form-control" id="searchTerm" name="searchTerm" value="@ViewBag.SearchTerm" />
+    </div>
+
+    <div class="mb-3">
+        <label for="authorName" class="form-label">Ім'я автора:</label>
+        <input type="text" class="form-control" id="authorName" name="authorName" value="@ViewBag.AuthorName" />
+    </div>
+
+    <div class="mb-3">
+        <label for="startDateFilter" class="form-label">Дата початку:</label>
+        <input type="date" class="form-control" id="startDateFilter" name="startDateFilter" value="@ViewBag.StartDateFilter" />
+    </div>
+
+    <div class="mb-3">
+        <label for="endDateFilter" class="form-label">Дата завершення:</label>
+        <input type="date" class="form-control" id="endDateFilter" name="endDateFilter" value="@ViewBag.EndDateFilter" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Застосувати</button>
+</form>
+
+<table id="publicationTable" class="display">
+    <tbody>
+        @foreach (var publication in Model)
+        {
+            <tr>
+                <td>
+                    <div class="py-1">
+                        <div>
+                            <a class="text-dark publication-title"
+                                asp-controller="Publications"
+                                asp-action="Index"
+                                asp-route-id="@publication.PublicationId">
+                                @publication.Title &mdash; @publication.PublicationDate.Year.ToString()
+                            </a>
+                        </div>
+                        <div>
+                            @foreach (var author in publication.Authors)
+                            {
+                                <a class="author-list"
+                                    asp-controller="Authors"
+                                    asp-action="Index"
+                                    asp-route-id="@author.AuthorId">
+                                    @author.LastName @author.FirstName @author.MiddleName
+                                </a>
+                                @if (!author.Equals(publication.Authors.Last()))
+                                {
+                                    <span class="comma">,&nbsp;</span>
+                                }
+                            }
+                        </div>
+                        <div>
+                            <p class="publication-description">@publication.Description</p>
+                        </div>
+                        <div>
+                            @foreach (var keyWord in publication.Keywords)
+                            {
+                                @* <span class="publication-keywords">@keyWord</span>
+                                @if (!keyWord.Equals(publication.Keywords.Last()))
+                                {
+                                    <span style="color:#D63384;">,&nbsp;</span>
+                                } *@
+
+                                <span class="badge bg-primary">
+                                    @keyWord
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('#publicationTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/uk.json"
+            },
+            "columns": [
+                null  // Placeholder for the second column
+            ], 
+            "searching": false,
+        });
+    });
+</script>
