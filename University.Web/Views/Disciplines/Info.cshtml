@@ -1,0 +1,107 @@
+﻿@model Discipline
+
+<style>
+    .publication-title {
+        font-size: 18px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .publication-title:hover {
+        text-decoration: underline; /* Underline on hover */
+    }
+
+    .author-list {
+        text-decoration: none;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        display: inline-block; /* Ensure it respects nowrap property */
+        color: #d63384;
+        word-wrap: break-word;
+        font-family: var(--bs-font-monospace);
+        direction: ltr;
+        unicode-bidi: bidi-override;
+    }
+
+    .author-list:hover {
+        text-decoration: underline;
+        color: #d63384;
+    }
+
+    .comma {
+        color: #d63384; /* Comma color */
+    }
+
+    .publication-description {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Limit to two lines */
+        -webkit-box-orient: vertical;
+        margin-bottom: .3rem;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $('#publicationTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/uk.json"
+            },
+            "columns": [
+                null  // Placeholder for the second column
+            ],
+            "searching": false,
+        });
+    });
+</script>
+
+<h3><code>@Model.Name</code></h3>
+<hr />
+
+<table id="publicationTable" class="display">
+    <tbody>
+        @foreach (var publication in Model.Publications)
+        {
+            <tr>
+                <td>
+                    <div class="py-1">
+                        <div>
+                            <a class="text-dark publication-title"
+                               asp-controller="Publications"
+                               asp-action="Index"
+                               asp-route-id="@publication.PublicationId">
+                                @publication.Title &mdash; @publication.PublicationDate.Value.Year.ToString()
+                            </a>
+                        </div>
+                        <div>
+                            @foreach (var author in publication.Authors)
+                            {
+                                <a class="author-list"
+                                   asp-controller="Lecturers"
+                                   asp-action="Index"
+                                   asp-route-id="@author.Id">
+                                    @author.LastName @author.FirstName @author.MiddleName
+                                </a>
+                                @if (!author.Equals(publication.Authors.Last()))
+                                {
+                                    <span class="comma">,&nbsp;</span>
+                                }
+                            }
+                        </div>
+                        <div>
+                            <p class="publication-description">@publication.Description</p>
+                        </div>
+                        <div>
+                            @foreach (var keyWord in publication.Keywords)
+                            {
+                                <span class="badge bg-primary">
+                                    @keyWord
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,71 @@
+﻿@model List<Plan>
+@{
+    bool authorized = SessionService.isAuthorized;
+    var (user, role) = SessionService.GetUser();
+}
+
+<div class="d-flex justify-content-between">
+    @if (Model.Any())
+    {
+        @if (role != Roles.EducationDepartment)
+        {
+            <h3 class="">@Model.First().Department.Name</h3>
+        }
+    }
+    @if (role == Roles.HeadOfDepartment)
+    {
+        <a class="btn btn-primary fw-bold"
+            asp-controller="Plans"
+            asp-action="Create">Створити план</a>   
+    }
+</div>
+<hr />
+
+<table class="table table-auto">
+    <thead>
+        <tr>
+            <th>Назва</th>
+            @if (role == Roles.EducationDepartment)
+            {
+                <th>Кафедра</th>
+            }
+            <th>Рік</th>
+            <th>Виконання</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var plan in Model)
+        {
+            <tr>
+                <td>@plan.Title</td>
+                @if(role == Roles.EducationDepartment)
+                {
+                    <td>@plan.Department.Name</td>
+                }
+                <td>@plan.Year</td>
+                <td>
+                    @if(role == Roles.HeadOfDepartment || role == Roles.EducationDepartment)
+                    {
+                        try
+                        {
+                            <text>@(((decimal)plan.MethodologicalPublications.Where(p => p.isPublished).Count() / plan.MethodologicalPublications.Count() * 100).ToString("0")) %</text>
+                        }
+                        catch (Exception ex) { }
+                    }
+                </td>
+                <td>
+                    <a asp-route-id="@plan.PlanId" asp-controller="Plans" asp-action="Info" class="text-primary mx-3">
+                        <i style="font-size: 1.2rem;" class="fa-solid fa-circle-info"></i>                        
+                    </a>
+                    @if (role == Roles.HeadOfDepartment || role == Roles.EducationDepartment)
+                    {
+                        <a asp-route-id="@plan.PlanId" asp-controller="Plans" asp-action="Download" class="text-primary" target="_blank">
+                            <i style="font-size: 1.2rem;" class="fa-solid fa-download"></i>
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

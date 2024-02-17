@@ -1,28 +1,31 @@
-﻿using Google.Apis.Drive.v3;
-using Microsoft.AspNetCore.Mvc;
-using Models.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
-using System.Text;
 using University.Web.Models.Post;
 using University.Web.Services;
 using University.Web.Services.Contracts;
-using University.WebApi.Models;
+using Models.Models;
+using University.WebApi.Dtos.PersonDtos;
+using Models.Roles;
+using University.WebApi.Dtos.MethodologicalPublicationDto;
+using University.WebApi.Dtos.ScientificPublicationDto;
 
 namespace University.Web.Controllers
 {
+    [Route("[controller]")]
     public class PublicationsController : Controller
     {
         private readonly ICloudStorageService cloudStorageService;
         private readonly IApiService apiService;
+        private readonly ISessionService sessionService;
 
-        public PublicationsController(ICloudStorageService cloudStorageService, IApiService apiService)
+        public PublicationsController(ICloudStorageService cloudStorageService, IApiService apiService, ISessionService sessionService)
         {
             this.cloudStorageService = cloudStorageService;
             this.apiService = apiService;
+            this.sessionService = sessionService;
         }
 
-        [HttpGet]
-        [Route("publications/all")]
+        [HttpGet("all")]
         public async Task<IActionResult> All(
             string searchTerm,
             string authorName,
@@ -49,8 +52,7 @@ namespace University.Web.Controllers
         }
 
 
-        [HttpGet]
-        [Route("publications/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> Index(int id)
         {
             var result = await apiService.GetPublicationInfoAsync(id);
@@ -60,12 +62,13 @@ namespace University.Web.Controllers
             return View("IndexId", result.Data);
         }
 
-        [HttpGet]
-        [Route("publications/upload")]
-        public IActionResult Upload() 
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("upload")]
+        public IActionResult UploadPublication() 
         {
             var model = new UploadPublication();
-            return View(model);
+            return View("Upload", model);
         }
 
         [HttpGet]
@@ -85,6 +88,7 @@ namespace University.Web.Controllers
             return File(fileBytes, contentType);
         }
 
+        
         [HttpPost]
         public async Task<IActionResult> Upload(UploadPublication model)
         {
@@ -98,7 +102,7 @@ namespace University.Web.Controllers
                 return BadRequest("Unable to upload file to GoogleDrive");
             #endregion
 
-            var publicationDto = new UploadPublicationDto
+            var publicationDto = new UploadMethodologicalPublicationDto
             {
                 Title = model.Title,
                 PublicationDate = model.PublicationDate ?? DateTime.Now,
@@ -112,7 +116,7 @@ namespace University.Web.Controllers
             {                    
                 model.Authors = model.Authors.EndsWith(", ") ? model.Authors.Substring(0, model.Authors.Length - 2) : model.Authors;
 
-                var result = await apiService.GetAuthorsAsync();
+                var result = await apiService.GetLecturersAsync();
                 if (!result.Success)
                 {
                     return BadRequest(result.ErrorMessage);
@@ -130,7 +134,7 @@ namespace University.Web.Controllers
                     {
                         var parts = pubAuthor.Split(" ");
 
-                        var r = await apiService.AddAuthorAsync(new AddAuthorDto
+                        var r = await apiService.AddPersonAsync(new PostPersonDto
                         {
                             LastName = parts[0],
                             FirstName = parts[1],
@@ -141,7 +145,7 @@ namespace University.Web.Controllers
                     }
                 }
 
-                result = await apiService.GetAuthorsAsync();
+                result = await apiService.GetLecturersAsync();
                 if (!result.Success)
                     return BadRequest(result.ErrorMessage);
 
@@ -166,48 +170,106 @@ namespace University.Web.Controllers
                 return BadRequest(apiResult.ErrorMessage);
 
             return RedirectToAction("Index", "Home");
-        }
+        }        
 
-        [Route("api/Authors/GetAuthors")]
-        public async Task<IActionResult> GetAuthorsFromDatabase(string term)
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("edit/{id}")]
+        public async Task<IActionResult> Edit(int id)
         {
-            var result = await apiService.GetAuthorsAsync();
-            if(!result.Success)
-                return BadRequest(result?.ErrorMessage);
+            var result = await apiService.GetPublicationInfoAsync(id);
+            if (!result.Success)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
 
-            var authors = result.Data
-                .Where(a => a.FirstName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                            a.LastName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
-                            a.MiddleName.Contains(term, StringComparison.OrdinalIgnoreCase))
-                .Select(a => $"{a.LastName} {a.FirstName} {a.MiddleName}")
-                .ToList();
+            Publication publication = result.Data;
 
-            return Ok(authors);
+            if(publication is MethodologicalPublication methPub) 
+            {
+                EditPublication model = new EditPublication
+                {
+                    Id = methPub.PublicationId,
+                    Title = methPub.Title,
+                    Abstract = methPub.Abstract,
+                    Description = methPub.Description,
+                    Volume = methPub.Volume,
+                    Language = methPub.Language,
+                    Type = methPub.Type
+                };
+
+                if(methPub.Keywords != null)
+                {
+                    model.Keywords = string.Join(", ", methPub.Keywords);
+                }
+
+                return View(model);
+            }
+
+            return View();
+        }
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpPost("edit/{id}")]
+        public async Task<IActionResult> Edit(EditPublication model, int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var editPublicatioin = new MethodologicalPublicationDto
+            {
+                Title = model.Title,
+                Abstract = model.Abstract,
+                Description = model.Description,
+                Keywords = model.Keywords.Split(',').Select(s => s.Trim().ToLower()).ToArray(),
+                Volume = model.Volume,
+                isPublished = true,
+                Language = model.Language,
+                Type = model.Type,
+                PublicationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
+            };
+
+
+
+            if (model.File != null)
+            {
+                string fileId = await cloudStorageService.UploadAsync(model.File);
+
+                if (fileId == null)
+                    return BadRequest("Unable to upload file to GoogleDrive");
+
+                editPublicatioin.CloudStorageGuid = fileId;
+            }
+            await apiService.EditPublication(editPublicatioin, id);
+
+
+            return RedirectToAction("All");
         }
 
 
-        //[HttpGet]
-        //public IActionResult Info(string fileId = "1OQ-ZrbaL389uHA_YwHrCGl9yC1vqFDPa") 
-        //{
-        //    if (string.IsNullOrEmpty(fileId))
-        //    {
-        //        // Handle the case where fileId is not provided
-        //        return RedirectToAction("Index"); // Redirect to the appropriate action
-        //    }
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("upload-scientific")]
+        public async Task<IActionResult> UploadScientificPublication()
+        {
+            var disciplines = (await apiService.GetDisciplinesListAsync());
+            var authors = await apiService.GetPeopleAsync();
+            var publication = new PostScientificPublicationDto();
+            publication.PublicationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
 
-        //    try
-        //    {
-        //        var file = cloudStorageService.Download(fileId);
+            ViewBag.Disciplines = disciplines;
+            ViewBag.Authors = authors;
 
-                
-        //        return File(file, "application/octet-stream");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle the exception, log, or redirect to an error page
-        //        return RedirectToAction("Index");
-        //    }
-        //}
+            return View(publication);
+        }
 
-    }
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpPost("upload-scientific")]
+        public async Task<IActionResult> UploadScientificPublication(PostScientificPublicationDto publicationDto)
+        {
+            return Ok();
+        }
+    }   
+
 }

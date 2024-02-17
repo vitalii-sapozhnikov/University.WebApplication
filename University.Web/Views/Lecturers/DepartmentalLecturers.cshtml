@@ -1,0 +1,37 @@
+﻿@using University.WebApi.Mapping
+@model (List<LecturerDto> lecturers, string departmentName)
+
+<h3>Викладачі</h3>
+<hr />
+<h3><code>@Model.departmentName</code></h3>
+<hr />
+
+<table class="table table-striped">
+    <tr>
+        <th>
+            ПІБ
+        </th>
+        <th>
+            Вчене звання
+        </th>
+        <th style="width: auto; text-align: center;">
+            Дії
+        </th>
+    </tr>
+    @foreach (var lect in Model.lecturers)
+    {
+        <tr>
+            <td>
+                @lect.LastName @lect.FirstName @lect.MiddleName
+            </td>
+            <td>
+                @lect.AcademicTitle.GetDisplayName()
+            </td>
+            <td style="width: 1%; text-align: center;">
+                <a class="btn btn-success btn-sm" asp-controller="Lecturers" asp-action="Index" asp-route-id="@lect.Id">
+                    <b>Ефективність</b>
+                </a>
+            </td>
+        </tr>
+    }
+</table>

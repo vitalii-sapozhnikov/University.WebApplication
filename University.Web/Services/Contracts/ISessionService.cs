@@ -7,10 +7,10 @@ namespace University.Web.Services.Contracts
         bool isAuthorized { get; }
 
         string GetBearerToken();
-        ApplicationUser GetUser();
+        (ApplicationUser user, string role) GetUser();
         void RemoveBearerToken();
         void RemoveUser();
         void SetBearerToken(string token);
-        void SetUser(ApplicationUser userInfo);
+        void SetUser(ApplicationUser userInfo, string role);
     }
 }

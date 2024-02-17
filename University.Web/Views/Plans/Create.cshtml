@@ -1,0 +1,132 @@
+﻿@using Models.Models
+@using University.WebApi.Mapping;
+@using University.Web.Services.Contracts;
+@inject IApiService apiService
+@model AddPlanDto
+
+<h3>Створити план</h3>
+<hr />
+
+<form asp-controller="Plans" asp-action="Create" method="post" enctype="multipart/form-data" id="addPlanForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row">
+        <div class="col-md-9">
+            <div class="form-group">
+                <label asp-for="Title">Назва</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Year">Рік</label>
+                <input asp-for="Year" class="form-control" />
+                <span asp-validation-for="Year" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-3">Публікації</h4>
+    <hr />
+    <div id="publicationsContainer"></div>
+    <a class="btn" id="addPublicationBtn">
+        <i style="font-size: 2rem;" class="fa-solid fa-circle-plus text-primary"></i>
+    </a>
+
+    <hr />
+    <button class="btn btn-primary" type="submit">Створити</button>
+</form>
+
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script> 
+
+
+        $(document).ready(function () {
+
+            var typeDict = {
+                @foreach (var type in Enum.GetValues<PublicationType>())
+                {
+                    <text>@((int)type): "@Html.Raw(type.GetDisplayName())",</text>
+                }
+            };
+
+            var lecturersDict = {
+                @{
+                    int depId = (await apiService.GetCurrentDepartmentId()).Data;
+                    var lecturers = (await apiService.GetLecturersAsync()).Data.Where(l => l.Departments.Any(d => d.DepartmentId == depId));
+
+                    foreach(var l in lecturers){
+                        <text>@(l.Id): "@Html.Raw($"{l.LastName} {l.FirstName} {l.MiddleName}")",</text>
+                    }
+                }
+            }
+            var publicationCounter = 0;
+
+            // "+" button click event
+            $("#addPublicationBtn").click(function () {
+                var publicationContainer = $("<div>", { class: "form-group" });
+
+                $("<label>", { for: `Publications[${publicationCounter}].Title`, text: "Назва:" }).appendTo(publicationContainer);
+                $("<input>", { class: "form-control", type: "text", name: `Publications[${publicationCounter}].Title` }).appendTo(publicationContainer);
+
+                var row = $("<div>", { class: "row mt-2" });
+
+                var volumeCol = $("<div>", { class: "col-md-4" });
+                $("<label>", { for: `Publications[${publicationCounter}].Volume`, text: "Об'єм (авт. арк.):" }).appendTo(volumeCol);
+                $("<input>", { class: "form-control", type: "number", name: `Publications[${publicationCounter}].Volume` }).appendTo(volumeCol);
+                volumeCol.appendTo(row);
+
+                var languageCol = $("<div>", { class: "col-md-4" });
+                $("<label>", { for: `Publications[${publicationCounter}].Language`, text: "Мова:" }).appendTo(languageCol);
+                var languageSelect = $("<select>", { class: "form-control", name: `Publications[${publicationCounter}].Language` });
+                languageCol.append(languageSelect);
+
+                var langDict = { 0: "Українська", 1: "Англійська" };
+
+                // Populate the select with options
+                $.each(langDict, function (value, text) {
+                    languageSelect.append($("<option>", { value: value, text: text }));
+                });
+
+                languageCol.appendTo(row);
+
+                var typeCol = $("<div>", { class: "col-md-4" });
+                $("<label>", { for: `Publications[${publicationCounter}].Type`, text: "Тип:" }).appendTo(typeCol);
+                var typeSelect = $("<select>", { class: "form-control", name: `Publications[${publicationCounter}].Type` });
+                typeCol.append(typeSelect);
+
+                $.each(typeDict, function (value, text) {
+                    typeSelect.append($("<option>", { value: value, text: text }));
+                });
+                
+                typeCol.appendTo(row);
+
+
+
+                $("<label>", { for: `Publications[${publicationCounter}].LecturerIds`, text: "Автори:"}).appendTo(publicationContainer);
+                var authorsSelect = $("<select>", { class: "form-control", name: `Publications[${publicationCounter}].LecturerIds`, multiple: "multiple" });
+
+                $.each(lecturersDict, function (value, text) {
+                    authorsSelect.append($("<option>", { value: value, text: text }));
+                });
+
+                publicationContainer.append(authorsSelect);
+
+
+
+                // Add other publication fields here
+
+                row.appendTo(publicationContainer);
+                $("<hr>").appendTo(publicationContainer);
+
+                $("#publicationsContainer").append(publicationContainer);
+
+                publicationCounter++;
+            });
+        });
+    </script>
+
+}

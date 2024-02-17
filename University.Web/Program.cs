@@ -6,7 +6,7 @@ namespace University.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +29,12 @@ namespace University.Web
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+
+            builder.Services.AddAuthentication("MyAuthenticationScheme")
+                .AddCookie("MyAuthenticationScheme", options =>
+                {
+                    options.LoginPath = "/Account/Login"; // Specify the login path
+                });
 
             builder.Services.AddScoped<ICookieService, CookieService>();
 
@@ -57,6 +63,7 @@ namespace University.Web
 
             app.UseSession();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
@@ -64,6 +71,7 @@ namespace University.Web
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
+
         }
     }
 }

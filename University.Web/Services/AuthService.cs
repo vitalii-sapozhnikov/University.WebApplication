@@ -1,4 +1,4 @@
-﻿using Models.Dtos;
+﻿using University.WebApi.Dtos;
 using NuGet.Protocol;
 using System.Text;
 using University.Web.Services.Contracts;
@@ -35,12 +35,13 @@ namespace University.Web.Services
 
                 var token = jsonResponse["token"]?.ToString();
                 var userInfo = jsonResponse["userInfo"]?.ToObject<ApplicationUser>();
+                var userRole = jsonResponse["userRole"]?.ToObject<string>();
 
-                if (!string.IsNullOrEmpty(token) && userInfo != null)
+                if (!string.IsNullOrEmpty(token) && userInfo != null && !string.IsNullOrEmpty(userRole))
                 {
                     _sessionService.SetBearerToken(token);
 
-                    _sessionService.SetUser(userInfo);
+                    _sessionService.SetUser(userInfo, userRole);
 
                     return (true, null);
                 }

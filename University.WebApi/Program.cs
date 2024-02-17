@@ -1,14 +1,10 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Abstractions;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using Models.Models;
 using Models.Roles;
+using System.Reflection;
 using System.Text;
 using University.WebApi.Contexts;
 using University.WebApi.Services;
@@ -20,6 +16,8 @@ namespace University.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
 
             builder.Services.AddControllers();
 
@@ -91,7 +89,7 @@ namespace University.WebApi
                 var roleManager = scopedProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
                 // Add roles here
-                var roles = new List<string> { Roles.Admin, Roles.User };
+                var roles = new List<string> { Roles.Admin, Roles.User, Roles.Lecturer, Roles.HeadOfDepartment, Roles.EducationDepartment };
 
                 foreach (var role in roles)
                 {

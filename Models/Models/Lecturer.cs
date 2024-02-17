@@ -1,16 +1,26 @@
 ﻿using Models.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace University.WebApi.Models
+namespace Models.Models
 {
-    public class Author
+    public enum AcademicTitle
     {
-        public int AuthorId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string MiddleName { get; set; }
+        [Display(Name = "Старший викладач")] SeniorLecturer, 
+        [Display(Name = "Доцент")] AssistantProfessor,
+        [Display(Name = "Професор")] Professor
+    }
+    public class Lecturer: Person
+    {        
+        public AcademicTitle AcademicTitle { get; set; }        
 
-        [JsonIgnore]
-        public virtual ICollection<Publication> Publications { get; set; }
+        // One to one ApplicationUser
+        public ApplicationUser ApplicationUser { get; set; }
+
+        // Many to many Department
+        public ICollection<Department> Departments { get; set; }
+
+        public virtual ICollection<LecturerDiscipline> LecturerDisciplines { get; set; }
     }
 }

@@ -1,0 +1,225 @@
+﻿@using Newtonsoft.Json
+@model Lecturer
+
+
+<style>
+    .publication-title {
+        font-size: 18px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .publication-title:hover {
+        text-decoration: underline; /* Underline on hover */
+    }
+
+    .publication-description {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Limit to two lines */
+        -webkit-box-orient: vertical;
+        margin-bottom: .3rem;
+    }
+</style>
+
+<h3>@($"{Model.LastName} {Model.FirstName} {Model.MiddleName}")</h3>
+<hr/>
+
+<form method="get" asp-controller="Lecturers" asp-action="Index" asp-route-id="@Model.Id">
+    <div class="row">
+        <div class="form-group col-3">
+            <label for="Years">Діапазон:</label>
+            <select name="years" id="Years" class="form-select">
+                <!option value="1">Останній рік</!option>
+                <!option value="5">Останні 5 років</!option>
+                <!option selected>Увесь час</!option>
+                <!option>Власний діапазон</!option>
+            </select>
+        </div>        
+
+        <div class="form-group col-3" id="beginDateGroup" style="display: none;">
+            <label for="beginDate">Дата початку:</label>
+            <input type="date" class="form-control" id="beginDate" name="beginDate">
+        </div>
+        <div class="form-group col-3" id="endDateGroup" style="display: none;">
+            <label for="endDate">Дата кінця:</label>
+            <input type="date" class="form-control" id="endDate" name="endDate">
+        </div>
+
+    </div>
+    
+
+    <button type="submit" class="btn btn-primary mt-2">Підтвердити</button>
+</form>
+<hr />
+
+<div class="row mt-3">
+    <div class="col-md-9">
+        <table id="publicationTable" class="display">
+                <tbody>
+                @foreach (var publication in Model.Publications)
+                {
+                    <tr>
+                        <td>
+                            <div class="py-1">
+                                <div>
+                                    <a class="text-dark publication-title"
+                                       asp-controller="Publications"
+                                       asp-action="Index"
+                                       asp-route-id="@publication.PublicationId">
+                                        @publication.Title &mdash; @publication.PublicationDate?.Year.ToString()
+                                    </a>
+                                </div>
+                                <div>
+                                    <p class="publication-description">@publication.Description</p>
+                                </div>
+                                <div>
+                                    @foreach (var keyWord in publication.Keywords)
+                                    {
+                                        <span class="badge bg-primary">
+                                            @keyWord
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+    </div>
+    <div class="col-md-3">
+        <canvas id="publicationsChart" height="400"></canvas>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        // Hide date input fields initially
+        $('#beginDateGroup').hide();
+        $('#endDateGroup').hide();
+
+        // Event listener for the select element
+        $('select[name="years"]').change(function () {
+            // Get the selected option value
+            var selectedOption = $(this).val();
+
+            // If "Власний діапазон" is selected, show the date input fields
+            if (selectedOption === "Власний діапазон") {
+                $('#beginDateGroup').show();
+                $('#endDate').val(new Date().toISOString().split('T')[0]);
+                $('#endDate').prop('max', new Date().toISOString().split('T')[0]);
+                $('#endDateGroup').show();
+            } else {
+                // Otherwise, hide the date input fields
+                $('#beginDateGroup').hide();
+                $('#endDateGroup').hide();
+
+                // Delete the "beginDate" and "endDate" parameters from the URL
+                var urlParams = new URLSearchParams(window.location.search);
+                urlParams.delete('beginDate');
+                urlParams.delete('endDate');
+
+                // Update the URL without the deleted parameters
+                history.replaceState(null, null, "?" + urlParams.toString());
+            }
+        });
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var beginDate = urlParams.get('beginDate');
+        var endDate = urlParams.get('endDate');
+        var range = urlParams.get('years');
+
+        if (range) {
+            $('select[name="years"]').val(range).change();
+        }
+
+        // Set the values of the date input fields if they are present in the route string
+        if (beginDate) {
+            $('#beginDate').val(beginDate);
+        }
+        if (endDate) {
+            $('#endDate').val(endDate);
+        }
+
+        $('select[name="years"]').change();
+
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#publicationTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/uk.json"
+            },
+            "columns": [
+                null  // Placeholder for the second column
+            ],
+            "searching": false,
+            "dom": 'lfrtip',
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    @{
+        int minYear = Model.Publications.Min(p => p.PublicationDate?.Year) ?? 2000;
+        int maxYear = DateTime.Now.Year;
+
+        Dictionary<int, int> publicationsByYear = new Dictionary<int, int>();
+
+        for (int year = minYear; year <= maxYear; year++)
+        {
+            publicationsByYear[year] = 0;
+        }
+
+        foreach (var publication in Model.Publications)
+        {
+            int year = publication.PublicationDate?.Year ?? -1;
+            if (year == -1)
+                throw new Exception("Null Publication Date");
+            publicationsByYear[year]++;
+    }
+    var chartLabels = publicationsByYear.Keys.ToList();
+    var chartData = publicationsByYear.Values.ToList();
+}
+
+    // Prepare data for the chart
+    var data = {
+        labels: @Html.Raw(Json.Serialize(chartLabels)),
+        datasets: [{
+            label: 'Кількість публікацій',
+            data: @Html.Raw(Json.Serialize(chartData)),
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    var options = {
+        scales: {
+            y: {
+                beginAtZero: true,
+                min: 0,
+                ticks:{
+                    stepSize: 1                    
+                }
+            }
+        }
+    };
+
+    // Get the canvas element
+    var ctx = document.getElementById('publicationsChart').getContext('2d');
+
+    // Create and render the chart
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: options
+    });
+</script>

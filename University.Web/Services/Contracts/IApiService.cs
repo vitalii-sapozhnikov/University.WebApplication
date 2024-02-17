@@ -1,5 +1,8 @@
-﻿using Models.Dtos;
-using University.WebApi.Models;
+﻿using University.WebApi.Dtos;
+using Models.Models;
+using University.WebApi.Dtos.PersonDtos;
+using Microsoft.AspNetCore.Mvc;
+using University.WebApi.Dtos.MethodologicalPublicationDto;
 
 namespace University.Web.Services.Contracts
 {
@@ -7,10 +10,23 @@ namespace University.Web.Services.Contracts
     {
         string Bearer { get; }
 
-        Task<Result<string>> AddAuthorAsync(AddAuthorDto addAuthorDto);
-        Task<Result<string>> AddPublicationAsync(UploadPublicationDto publicationDto);
-        Task<Result<List<AuthorDto>>> GetAuthorsAsync();
+        Task<Result<string>> AddPersonAsync(PostPersonDto addAuthorDto);
+        Task<Result<string>> AddPublicationAsync(UploadMethodologicalPublicationDto publicationDto);
+        Task<Result<List<LecturerDto>>> GetLecturersAsync();
         Task<Result<Publication>> GetPublicationInfoAsync(int idx);
         Task<Result<List<PublicationShortDto>>> GetPublicationsAsync(string? searchTerm = null, string? authorName = null, DateTime? startDateFilter = null, DateTime? endDateFilter = null);
+        Task<Result<Lecturer>> GetLecturerAsync(int id);
+        Task<Result<List<Plan>>> GetPlansAsync();
+        Task<Result<byte[]>> DownloadPlanAsync(int id);
+        Task<Result<string>> AddPlanAsync(AddPlanDto addPlanDto);
+        Task<Result<int>> GetCurrentDepartmentId();
+        Task<Result<Plan>> GetPlanInfoAsync(int id);
+        Task<Result<string>> EditPublication(MethodologicalPublicationDto model, int id);
+        Task<Result<List<Department>>> GetDepartmentsAsync();
+        Task<Result<List<Discipline>>> GetDisciplinesAsync();
+        Task<Result<Discipline>> GetDisciplineAsync(int id);
+        Task<Result<string>> PostDisciplineAsync(string disciplineName);
+        Task<List<GetPersonDto>?> GetPeopleAsync();
+        Task<List<Discipline>?> GetDisciplinesListAsync();
     }
 }

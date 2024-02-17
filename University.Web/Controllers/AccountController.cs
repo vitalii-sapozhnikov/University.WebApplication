@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Models.Dtos;
+using University.WebApi.Dtos;
 using University.Web.Services;
 using University.Web.Services.Contracts;
 
 namespace University.Web.Controllers
 {
+    [Route("[controller]")]
     public class AccountController : Controller
     {
         private readonly IAuthService _authService;
@@ -16,14 +17,14 @@ namespace University.Web.Controllers
             _apiService = apiService;
         }
 
-        [HttpGet]
+        [HttpGet("login")]
         public IActionResult Login()
         {
             var model = new LoginUser();
             return View(model);
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginUser model)
         {
@@ -46,21 +47,21 @@ namespace University.Web.Controllers
             return View(model);
         }
 
-        [HttpGet]
+        [HttpGet("logout")]
         public IActionResult Logout()
         {
             _authService.Logout();
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
+        [HttpGet("register")]
         public IActionResult Register()
         {
             RegisterUserDto userDto = new RegisterUserDto();
             return View(userDto);
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterUserDto model)
         {
             if (ModelState.IsValid)

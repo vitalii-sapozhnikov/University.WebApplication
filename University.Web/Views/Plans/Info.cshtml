@@ -1,0 +1,154 @@
+﻿@using University.Web.Services.Contracts
+@using University.WebApi.Mapping
+
+@inject IApiService apiService 
+@model Plan
+
+@{
+    bool authorized = SessionService.isAuthorized;
+    var (user, role) = SessionService.GetUser();
+}
+
+<h3>@Model.Title</h3> <hr />
+
+<div class="row">
+    <div class="col-md-9">
+        <p style="margin-bottom: 0;" class="fw-bold">@Model.Department.Name</p>
+    </div>
+    <div class="col-md-3">
+        <p style="margin-bottom: 0;" class="text-end"><span class="fw-bold">Рік:</span> @Model.Year</p>
+    </div>
+</div>
+<hr />
+
+
+@foreach (var publication in Model.MethodologicalPublications)
+{
+    <div class="card border-secondary mb-3">
+        <div class="card-header d-flex">
+            @publication?.Type?.GetDisplayName()
+            @if (publication.isPublished)
+            {
+                <span style="margin-left: auto;" class="badge bg-success">Опубліковано</span>               
+            }
+        </div>
+        <div class="card-body">
+            @if(publication.isPublished)
+            {
+                <a asp-controller="Publications" asp-action="Index" asp-route-id="@publication.PublicationId" class="text-dark">
+                    <h5 style="font-size: 1.1rem;" class="card-title">@publication.Title</h5>
+                </a>
+            }
+            else
+            {
+                <h5 style="font-size: 1.1rem;" class="card-title">@publication.Title</h5>                
+            }
+
+            <div class="d-flex justify-content-between align-items-end">
+                <p class="card-text my-0">
+                    @if (publication.Authors.Count() > 1)
+                    {
+                        <text>Укладачі: </text>
+                    }
+                    else
+                    {
+                        <text>Укладач: </text>
+                    }
+                    @String.Join(", ", publication.Authors.Select(l => l.FullName).ToArray())
+                    <br />
+                    Обсяг: @publication.Volume авт. арк.
+                    <br />
+                    Мова: @publication?.Language?.GetDisplayName()
+                </p>
+                @if (!publication.isPublished && role == Roles.HeadOfDepartment)
+                {
+                    <a href="#" class="text-warning" style="font-size: 1.1rem;" data-bs-toggle="modal" data-bs-target="#editModal-@(publication.PublicationId)">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+
+                    <div class="modal fade" id="editModal-@(publication.PublicationId)" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <form asp-controller="Plans" asp-action="Edit" asp-route-publicationId="@publication.PublicationId" asp-route-planId="@Model.PlanId" method="post">
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editModalLabel">Змінити</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label asp-for="@publication.Title">Назва</label>
+                                            <input asp-for="@publication.Title" class="form-control" />
+                                            <span asp-validation-for="@publication.Title" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group mt-2">
+                                            <label asp-for="@publication.Volume">Об'єм</label>
+                                            <input asp-for="@publication.Volume" class="form-control" />
+                                            <span asp-validation-for="@publication.Volume" class="text-danger"></span>
+                                        </div>
+                                        @{
+                                            var languageEnum = Enum.GetValues<Language>();
+                                            var languageList = languageEnum.Cast<Language>().Select(e => new SelectListItem
+                                            {
+                                                Value = ((int)e).ToString(),
+                                                Text = e.GetDisplayName() // Assuming you have a GetDisplayName method for the enum
+                                            });
+                                        }
+                                        <div class="form-group mt-2">
+                                            <label asp-for="@publication.Language">Мова</label>
+                                            <select asp-for="@publication.Language" class="form-control" asp-items="@(languageList)"></select>
+                                            <span asp-validation-for="@publication.Language" class="text-danger"></span>
+                                        </div>
+                                        @{
+                                            var typeEnum = Enum.GetValues<PublicationType>();
+                                            var typeList = typeEnum.Cast<PublicationType>().Select(e => new SelectListItem
+                                            {
+                                                Value = ((int)e).ToString(),
+                                                Text = e.GetDisplayName() // Assuming you have a GetDisplayName method for the enum
+                                            });
+                                        }
+                                        <div class="form-group mt-2">
+                                            <label asp-for="@publication.Type">Тип</label>
+                                            <select asp-for="@publication.Type" class="form-control" asp-items="@(typeList)"></select>
+                                            <span asp-validation-for="@publication.Type" class="text-danger"></span>
+                                        </div>
+
+                                        @{
+                                            var result = await apiService.GetLecturersAsync();
+                                        
+                                            var lecturersList = result.Data.Where(l => l.Departments.Any(d => d.DepartmentId == Model.DepartmentId)).Select(e => new SelectListItem
+                                            {
+                                                Value = (e.Id).ToString(),
+                                                Text = $"{e.LastName} {e.FirstName} {e.MiddleName}",
+                                                Selected = publication.Authors.Any(l => l.Id == e.Id)
+                                            });
+
+                                        }
+                                        <div class="form-group mt-2">
+                                            <label asp-for="@publication.Authors">Укладачі</label>
+                                            <select multiple="" asp-for="@publication.LecturerIds" class="form-control" asp-items="@(lecturersList)"></select>
+                                            <span asp-validation-for="@publication.LecturerIds" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                                        <button type="submit" class="btn btn-primary">Зберегти</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if(!publication.isPublished && role == Roles.Lecturer)
+                {
+                    <a asp-controller="Publications" asp-action="Edit" asp-route-id="@publication.PublicationId" class="text-warning" style="font-size: 1.1rem;">
+                        <i class="fa-solid fa-upload"></i>
+                    </a>
+                }
+            </div>
+            
+        </div>
+    </div>
+}
+
+<hr />

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Models.Dtos;
+using University.WebApi.Dtos;
 using Models.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -28,10 +28,7 @@ namespace University.WebApi.Services
             var identityUser = new ApplicationUser
             {
                 UserName = user.Email,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                MiddleName = user.MiddleName
+                Email = user.Email                
             };
 
             var result = await _userManager.CreateAsync(identityUser, user.Password);
@@ -82,12 +79,23 @@ namespace University.WebApi.Services
             }
         }
 
-        public string GenerateTokenString(LoginUser user)
+        public async Task<ApplicationUser> GetUser(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
+        }
+
+        public async Task<IList<string>> GetRole(string email)
+        {
+            var user = await GetUser(email);
+            return await _userManager.GetRolesAsync(user);
+        }
+
+        public string GenerateTokenString(LoginUser user, string role)
         {
             IEnumerable<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, "User"),
+                new Claim(ClaimTypes.Role, role),
 
             };
 

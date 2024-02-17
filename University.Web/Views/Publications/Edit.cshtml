@@ -1,0 +1,174 @@
+﻿@using University.WebApi.Mapping
+@model EditPublication
+
+<form asp-controller="Publications" asp-action="Edit" method="post" asp-route-id="@Model.Id" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+
+    <div class="form-group mt-2">
+        <label asp-for="Abstract"></label>
+        <textarea asp-for="Abstract" class="form-control"></textarea>
+        <span asp-validation-for="Abstract" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-2">
+        <label asp-for="File"></label>
+        <input asp-for="File" class="form-control" />
+        <span asp-validation-for="File" class="text-danger"></span>
+    </div>
+
+    <div class="input-group mt-3">
+        <input asp-for="Keywords" id="Keywords" class="form-control" placeholder="Ключові слова" />
+        <span asp-validation-for="Keywords" class="text-danger"></span>
+        <button type="button" id="extractKeywordsBtn" class="btn btn-primary">Вибрати ключові слова</button>
+    </div>
+
+    <div class="d-flex align-items-center my-2 d-none" id="loadingSpinner">
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <div>
+            <p class="loading-text mx-2" style="margin-bottom: 0px;">Триває обробка...</p>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="form-group col-md-4">
+            <label asp-for="Volume"></label>
+            <input asp-for="Volume" class="form-control" placeholder="" />
+            <span asp-validation-for="Volume" class="text-danger"></span>
+        </div>
+
+        @{
+            var typeEnum = Enum.GetValues<PublicationType>();
+            var typeList = typeEnum.Cast<PublicationType>().Select(e => new SelectListItem
+            {
+                Value = ((int)e).ToString(),
+                Text = e.GetDisplayName() // Assuming you have a GetDisplayName method for the enum
+            });
+        }
+        <div class="form-group col-md-4">
+            <label asp-for="Type"></label>
+            <select asp-for="Type" class="form-control" asp-items="@(typeList)"></select>
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+
+        @{
+            var languageEnum = Enum.GetValues<Language>();
+            var languageList = languageEnum.Cast<Language>().Select(e => new SelectListItem
+            {
+                Value = ((int)e).ToString(),
+                Text = e.GetDisplayName() // Assuming you have a GetDisplayName method for the enum
+            });
+        }
+        <div class="form-group col-md-4">
+            <label asp-for="Language">Мова</label>
+            <select asp-for="Language" class="form-control" asp-items="@(languageList)"></select>
+            <span asp-validation-for="Language" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-success w-100 tex">Підтвердити</button>
+    </div>
+</form>
+
+<script>
+    $(function () {
+        var getAuthorsUrl = "/api/Lecturers/GetAuthors"; // Adjust the URL to your actual endpoint
+
+        function split(val) {
+            return val.split(/,\s*/);
+        }
+
+        function extractLast(term) {
+            var terms = split(term);
+            return terms.length === 1 ? terms[0] : terms.pop();
+        }
+
+        $("#Authors")
+            .on("keydown", function (event) {
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete("instance").menu.active) {
+                    event.preventDefault();
+                }
+            })
+            .autocomplete({
+                minLength: 3,
+                source: function (request, response) {
+                    $.ajax({
+                        url: getAuthorsUrl,
+                        data: { term: extractLast(request.term) }, // Use extractLast to get the correct term
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                focus: function () {
+                    return false;
+                },
+                select: function (event, ui) {
+                    var terms = split(this.value);
+                    terms.pop();
+                    terms.push(ui.item.value);
+                    terms.push("");
+                    this.value = terms.join(", ");
+                    return false;
+                }
+            });
+    });
+</script>
+
+<script>
+    $(function () {
+        // Existing code ...
+
+        $("#extractKeywordsBtn").on("click", function () {
+            var fileInput = $("#File")[0];
+
+            if (fileInput.files.length > 0) {
+                $("#loadingSpinner").removeClass("d-none");
+                var formData = new FormData();
+                formData.append("file", fileInput.files[0]);
+                formData.append("n", 5);
+
+                $.ajax({
+                    type: "POST",
+                    url: "http://127.0.0.1:5000/api/extract_keywords",
+                    data: formData,
+                    processData: false,
+                    contentType: false,  // Set contentType to false
+                    success: function (result) {
+                        if (result.keyphrases) {
+                            $("#loadingSpinner").addClass("d-none");
+                            // Append extracted keywords to the Keywords input
+                            var existingKeywords = $("#Keywords").val();
+                            var newKeywords = result.keyphrases.join(", ");
+                            $("#Keywords").val(existingKeywords ? existingKeywords + ", " + newKeywords : newKeywords);
+                        } else {
+                            $("#loadingSpinner").addClass("d-none");
+                            alert("Failed to extract keywords. " + result.error);
+                        }
+                    },
+                    error: function () {
+                        $("#loadingSpinner").addClass("d-none");
+                        alert("An error occurred while extracting keywords.");
+                    }
+                });
+            } else {
+                alert("Please select a file first.");
+            }
+        });
+    });
+</script>

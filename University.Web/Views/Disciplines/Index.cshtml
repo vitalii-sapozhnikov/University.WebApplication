@@ -1,0 +1,56 @@
+﻿@model (List<Discipline> disciplines, string departmentName)
+
+<div class="d-flex justify-content-between">
+    <h3>Дисципліни</h3>
+    <a class="btn btn-primary" data-toggle="modal" data-target="#addDisciplineModal">Додати дисципліну</a>
+
+    <div class="modal fade" id="addDisciplineModal" tabindex="-1" role="dialog" aria-labelledby="addDisciplineModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDisciplineModalLabel">Додати дисципліну</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to add discipline -->
+                    <form id="addDisciplineForm" asp-controller="Disciplines" asp-action="" method="post">
+                        <div class="form-group">
+                            <label for="disciplineName">Назва дисципліни</label>
+                            <input type="text" class="form-control" id="disciplineName" name="disciplineName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Додати</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<h3><code>@Model.departmentName</code></h3>
+<hr />
+
+<table class="table table-striped">
+    <tr>
+        <th>
+            Назва
+        </th>
+        <th style="width: auto; text-align: center;">
+            Дії
+        </th>
+    </tr>
+    @foreach (var discipline in Model.disciplines)
+    {
+        <tr>
+            <td>
+                @discipline.Name
+            </td>
+            <td style="width: 1%; text-align: center;">
+                <a class="btn btn-success btn-sm" asp-controller="Disciplines" asp-route-id="@discipline.Id">
+                    <b>Наповнення</b>
+                </a>
+            </td>
+        </tr>
+    }
+</table>

@@ -1,4 +1,4 @@
-﻿@model University.WebApi.Models.Publication
+﻿@model Publication
 
 @{
     ViewData["Title"] = "Publication Details";
@@ -9,20 +9,23 @@
 
     <div class="row">
         <div class="col-md-6">
-            <p><strong>Дата публікації:</strong> @Model.PublicationDate.ToShortDateString()</p>
+            <p><strong>Дата публікації:</strong> @Model.PublicationDate?.ToShortDateString()</p>
             <p><strong>Автори:</strong> @string.Join(", ", Model.Authors.Select(a => $"{a.LastName} {a.FirstName} {a.MiddleName}"))</p>
             @* <p><strong>Uploaded By:</strong> @Model.User.UserName</p> *@
         </div>
 
-        <div class="col-md-6">
-            <a asp-action="DownloadFile" 
+        @if (Model is MethodologicalPublication methPub)
+        {
+            <div class="col-md-6">
+                <a asp-action="DownloadFile" 
                 asp-controller="Publications"
-                asp-route-id="@Model.CloudStorageGuid"
+                   asp-route-id="@methPub.CloudStorageGuid"
                 class="text-primary"
                 target="_blank">
                 Завантажити
             </a>
-        </div>
+            </div>
+        }
     </div>
 
     <hr />

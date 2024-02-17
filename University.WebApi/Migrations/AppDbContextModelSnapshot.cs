@@ -22,19 +22,49 @@ namespace University.WebApi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("AuthorPublication", b =>
+            modelBuilder.Entity("DepartmentLecturer", b =>
                 {
-                    b.Property<int>("AuthorsAuthorId")
+                    b.Property<int>("DepartmentsDepartmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LecturersId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("DepartmentsDepartmentId", "LecturersId");
+
+                    b.HasIndex("LecturersId");
+
+                    b.ToTable("DepartmentLecturer");
+                });
+
+            modelBuilder.Entity("DisciplinePublication", b =>
+                {
+                    b.Property<int>("DisciplinesId")
                         .HasColumnType("integer");
 
                     b.Property<int>("PublicationsPublicationId")
                         .HasColumnType("integer");
 
-                    b.HasKey("AuthorsAuthorId", "PublicationsPublicationId");
+                    b.HasKey("DisciplinesId", "PublicationsPublicationId");
 
                     b.HasIndex("PublicationsPublicationId");
 
-                    b.ToTable("AuthorPublication");
+                    b.ToTable("DisciplinePublication");
+                });
+
+            modelBuilder.Entity("DisciplineWorkPlan", b =>
+                {
+                    b.Property<int>("DisciplinesId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WorkPlanId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("DisciplinesId", "WorkPlanId");
+
+                    b.HasIndex("WorkPlanId");
+
+                    b.ToTable("DisciplineWorkPlan");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -188,23 +218,11 @@ namespace University.WebApi.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("MiddleName")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -245,13 +263,156 @@ namespace University.WebApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("University.WebApi.Models.Author", b =>
+            modelBuilder.Entity("Models.Models.Department", b =>
                 {
-                    b.Property<int>("AuthorId")
+                    b.Property<int>("DepartmentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AuthorId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DepartmentId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("DepartmentId");
+
+                    b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            DepartmentId = 1,
+                            Name = "Кафедра диференціальних рівнянь, геометрії та топології"
+                        },
+                        new
+                        {
+                            DepartmentId = 2,
+                            Name = "Кафедра комп'ютерних систем та технологій"
+                        },
+                        new
+                        {
+                            DepartmentId = 3,
+                            Name = "Кафедра комп’ютерної алгебри та дискретної математики"
+                        },
+                        new
+                        {
+                            DepartmentId = 4,
+                            Name = "Кафедра математичного аналізу"
+                        },
+                        new
+                        {
+                            DepartmentId = 5,
+                            Name = "Кафедра математичного забезпечення комп’ютерних систем"
+                        },
+                        new
+                        {
+                            DepartmentId = 6,
+                            Name = "Кафедра методів математичної фізики"
+                        },
+                        new
+                        {
+                            DepartmentId = 7,
+                            Name = "Кафедра механіки, автоматизації та інформаційних технологій"
+                        },
+                        new
+                        {
+                            DepartmentId = 8,
+                            Name = "Кафедра оптимального керування та економічної кібернетики"
+                        },
+                        new
+                        {
+                            DepartmentId = 9,
+                            Name = "Кафедра фізики та астрономії"
+                        });
+                });
+
+            modelBuilder.Entity("Models.Models.Discipline", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Disciplines");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Організація бази даних"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Інженерія програмного забезпечення"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Введення в систему підтримки прийняття рішень"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Технологія тестування програмного забезпечення"
+                        });
+                });
+
+            modelBuilder.Entity("Models.Models.EducationYear", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EducationYear");
+                });
+
+            modelBuilder.Entity("Models.Models.LecturerDiscipline", b =>
+                {
+                    b.Property<int>("LecturerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DisciplineId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("BeginDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("LecturerId", "DisciplineId");
+
+                    b.HasIndex("DisciplineId");
+
+                    b.ToTable("LecturerDisciplines");
+                });
+
+            modelBuilder.Entity("Models.Models.Person", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -265,9 +426,102 @@ namespace University.WebApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("AuthorId");
+                    b.HasKey("Id");
 
-                    b.ToTable("Authors");
+                    b.ToTable("Person", (string)null);
+
+                    b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("Models.Models.Plan", b =>
+                {
+                    b.Property<int>("PlanId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PlanId"));
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PlanId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("Plans");
+                });
+
+            modelBuilder.Entity("Models.Models.Speciality", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Specialities");
+                });
+
+            modelBuilder.Entity("Models.Models.WorkPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Course")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EducationYearId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PreparationLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SpecialityId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("EducationYearId");
+
+                    b.HasIndex("SpecialityId");
+
+                    b.ToTable("WorkPlans");
+                });
+
+            modelBuilder.Entity("PersonPublication", b =>
+                {
+                    b.Property<int>("AuthorsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PublicationsPublicationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("AuthorsId", "PublicationsPublicationId");
+
+                    b.HasIndex("PublicationsPublicationId");
+
+                    b.ToTable("PersonPublication");
                 });
 
             modelBuilder.Entity("University.WebApi.Models.Publication", b =>
@@ -279,49 +533,147 @@ namespace University.WebApi.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PublicationId"));
 
                     b.Property<string>("Abstract")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CloudStorageGuid")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string[]>("Keywords")
-                        .IsRequired()
                         .HasColumnType("text[]");
 
-                    b.Property<DateTime>("PublicationDate")
+                    b.Property<int?>("Language")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PublicationDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<int?>("Volume")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("isPublished")
+                        .HasColumnType("boolean");
 
                     b.HasKey("PublicationId");
 
-                    b.HasIndex("UserId");
+                    b.ToTable("Publications", (string)null);
 
-                    b.ToTable("Publications");
+                    b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("AuthorPublication", b =>
+            modelBuilder.Entity("Models.Models.HeadOfDepartment", b =>
                 {
-                    b.HasOne("University.WebApi.Models.Author", null)
+                    b.HasBaseType("Models.Models.Person");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("DepartmentId")
+                        .IsUnique();
+
+                    b.ToTable("HeadsOfDepartments", (string)null);
+                });
+
+            modelBuilder.Entity("University.WebApi.Models.Lecturer", b =>
+                {
+                    b.HasBaseType("Models.Models.Person");
+
+                    b.Property<int>("AcademicTitle")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Lecturers", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Models.MethodologicalPublication", b =>
+                {
+                    b.HasBaseType("University.WebApi.Models.Publication");
+
+                    b.Property<string>("CloudStorageGuid")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PlanId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("PlanId");
+
+                    b.ToTable("MethodologicalPublications", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Models.ScientificPublication", b =>
+                {
+                    b.HasBaseType("University.WebApi.Models.Publication");
+
+                    b.Property<string>("DOI")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("JournalDetails")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("JournalType")
+                        .HasColumnType("integer");
+
+                    b.ToTable("ScientificPublications", (string)null);
+                });
+
+            modelBuilder.Entity("DepartmentLecturer", b =>
+                {
+                    b.HasOne("Models.Models.Department", null)
                         .WithMany()
-                        .HasForeignKey("AuthorsAuthorId")
+                        .HasForeignKey("DepartmentsDepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("University.WebApi.Models.Lecturer", null)
+                        .WithMany()
+                        .HasForeignKey("LecturersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DisciplinePublication", b =>
+                {
+                    b.HasOne("Models.Models.Discipline", null)
+                        .WithMany()
+                        .HasForeignKey("DisciplinesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("University.WebApi.Models.Publication", null)
                         .WithMany()
                         .HasForeignKey("PublicationsPublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DisciplineWorkPlan", b =>
+                {
+                    b.HasOne("Models.Models.Discipline", null)
+                        .WithMany()
+                        .HasForeignKey("DisciplinesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Models.WorkPlan", null)
+                        .WithMany()
+                        .HasForeignKey("WorkPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -377,18 +729,162 @@ namespace University.WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("University.WebApi.Models.Publication", b =>
+            modelBuilder.Entity("Models.Models.LecturerDiscipline", b =>
                 {
-                    b.HasOne("Models.Models.ApplicationUser", "User")
-                        .WithMany("Publications")
-                        .HasForeignKey("UserId");
+                    b.HasOne("Models.Models.Discipline", "Discipline")
+                        .WithMany("LecturerDisciplines")
+                        .HasForeignKey("DisciplineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("University.WebApi.Models.Lecturer", "Lecturer")
+                        .WithMany("LecturerDisciplines")
+                        .HasForeignKey("LecturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Discipline");
+
+                    b.Navigation("Lecturer");
                 });
 
-            modelBuilder.Entity("Models.Models.ApplicationUser", b =>
+            modelBuilder.Entity("Models.Models.Plan", b =>
                 {
-                    b.Navigation("Publications");
+                    b.HasOne("Models.Models.Department", "Department")
+                        .WithMany("Plans")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("Models.Models.WorkPlan", b =>
+                {
+                    b.HasOne("Models.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Models.EducationYear", "EducationYear")
+                        .WithMany()
+                        .HasForeignKey("EducationYearId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Models.Speciality", "Speciality")
+                        .WithMany()
+                        .HasForeignKey("SpecialityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("EducationYear");
+
+                    b.Navigation("Speciality");
+                });
+
+            modelBuilder.Entity("PersonPublication", b =>
+                {
+                    b.HasOne("Models.Models.Person", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("University.WebApi.Models.Publication", null)
+                        .WithMany()
+                        .HasForeignKey("PublicationsPublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Models.Models.HeadOfDepartment", b =>
+                {
+                    b.HasOne("Models.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("Models.Models.Department", "Department")
+                        .WithOne("HeadOfDepartment")
+                        .HasForeignKey("Models.Models.HeadOfDepartment", "DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Models.Person", null)
+                        .WithOne()
+                        .HasForeignKey("Models.Models.HeadOfDepartment", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("University.WebApi.Models.Lecturer", b =>
+                {
+                    b.HasOne("Models.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("Models.Models.Person", null)
+                        .WithOne()
+                        .HasForeignKey("University.WebApi.Models.Lecturer", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Models.Models.MethodologicalPublication", b =>
+                {
+                    b.HasOne("Models.Models.Plan", "Plan")
+                        .WithMany("MethodologicalPublications")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("University.WebApi.Models.Publication", null)
+                        .WithOne()
+                        .HasForeignKey("Models.Models.MethodologicalPublication", "PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("Models.Models.ScientificPublication", b =>
+                {
+                    b.HasOne("University.WebApi.Models.Publication", null)
+                        .WithOne()
+                        .HasForeignKey("Models.Models.ScientificPublication", "PublicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Models.Models.Department", b =>
+                {
+                    b.Navigation("HeadOfDepartment")
+                        .IsRequired();
+
+                    b.Navigation("Plans");
+                });
+
+            modelBuilder.Entity("Models.Models.Discipline", b =>
+                {
+                    b.Navigation("LecturerDisciplines");
+                });
+
+            modelBuilder.Entity("Models.Models.Plan", b =>
+                {
+                    b.Navigation("MethodologicalPublications");
+                });
+
+            modelBuilder.Entity("University.WebApi.Models.Lecturer", b =>
+                {
+                    b.Navigation("LecturerDisciplines");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,13 +1,14 @@
-﻿using Models.Dtos;
-using University.WebApi.Models;
+﻿using Models.Models;
+using University.WebApi.Dtos;
+using University.WebApi.Dtos.PersonDtos;
 
 namespace University.WebApi.Mapping
 {
     public static class MappingExtensions
     {
-        public static Author ToAuthorEntity(this AddAuthorDto authorDto)
+        public static Lecturer ToLecturerEntity(this PostPersonDto authorDto)
         {
-            return new Author
+            return new Lecturer
             {
                 FirstName = authorDto.FirstName,
                 LastName = authorDto.LastName,
@@ -15,28 +16,18 @@ namespace University.WebApi.Mapping
             };
         }
 
-        public static AuthorDto ToAuthorDto(this Author author)
+        public static LecturerDto ToLecturerDto(this Lecturer lecturer)
         {
-            return new AuthorDto
+            return new LecturerDto
             {
-                Id = author.AuthorId,
-                FirstName = author.FirstName,
-                LastName = author.LastName,
-                MiddleName = author.MiddleName
+                Id = lecturer.Id,
+                FirstName = lecturer.FirstName,
+                LastName = lecturer.LastName,
+                MiddleName = lecturer.MiddleName,
+                Departments = lecturer.Departments,
+                AcademicTitle = lecturer.AcademicTitle
             };
         }
 
-        public static Publication ToPublicationEntity(this UploadPublicationDto publicationDto)
-        {
-            return new Publication
-            {
-                Title = publicationDto.Title,
-                Abstract = publicationDto.Abstract,
-                Description = publicationDto.Description,
-                PublicationDate = publicationDto.PublicationDate,
-                Keywords = publicationDto.Keywords,
-                CloudStorageGuid = publicationDto.CloudStorageId
-            };
-        }
     }
 }

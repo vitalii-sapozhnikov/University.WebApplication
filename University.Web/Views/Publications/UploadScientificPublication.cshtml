@@ -1,0 +1,176 @@
+﻿@using University.WebApi.Dtos.PersonDtos
+@using University.WebApi.Dtos.ScientificPublicationDto
+@model PostScientificPublicationDto
+@{
+    List<Discipline> disciplines = ViewBag.Disciplines;
+    List<GetPersonDto> authors = ViewBag.Authors;
+}
+
+<style>
+    .chosen-container-multi {
+        border: none;
+    }
+
+        .chosen-container-multi .chosen-choices {
+            background-image: none;
+            padding: 7px;
+            border: none !important;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+        }
+
+            .chosen-container-multi .chosen-choices li.search-choice {
+                -webkit-box-shadow: none;
+                box-shadow: none;
+                padding-top: 7px;
+                padding-bottom: 7px;
+                padding-left: 10px;
+                padding-right: 26px;
+                border: none;
+                background-image: none;
+            }
+
+                .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+                    top: 9px;
+                    right: 8px;
+                }
+
+            .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+                height: 32px;
+                font-size: 14px;
+            }
+
+    .chosen-container .chosen-drop {
+        border: none !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        margin-top: 3px;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /*Colors*/
+    .color-1 .chosen-container-multi .chosen-choices li.search-choice {
+        background-color: #e5e4cc;
+    }
+
+    .color-2 .chosen-container-multi .chosen-choices li.search-choice {
+        background-color: #c7f0db;
+    }
+
+    .color-3 .chosen-container-multi .chosen-choices li.search-choice {
+        background-color: #d3f4ff;
+    }
+</style>
+
+
+<h3>Додати наукову статтю</h3>
+<hr />
+<form asp-action="UploadScientificPublication" method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Title"></label>
+                <input asp-for="Title" type="text" class="form-control">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="Language"></label>
+                <select class="form-select" asp-for="Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="Volume"></label>
+                <input class="form-control" asp-for="Volume" />
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="PublicationDate"></label>
+                <input class="form-control" asp-for="PublicationDate" type="date" />
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-8">
+            <div class="form-group">
+                <label asp-for="JournalDetails"></label>
+                <input class="form-control" asp-for="JournalDetails" />
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="JournalType"></label>
+                <select class="form-select" asp-for="JournalType" asp-items="Html.GetEnumSelectList<JournalType>()"></select>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="DOI"></label>
+                <input class="form-control" asp-for="DOI" />
+            </div>
+        </div>
+        
+    </div>
+    <div class="mt-2">
+        <div class="form-group">
+            <label asp-for="Abstract"></label>
+            <textarea class="form-control" asp-for="Abstract" type="text" rows="3"></textarea>
+        </div>
+    </div>
+    <div class="mt-2">
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <textarea class="form-control" asp-for="Description" type="text" rows="3"></textarea>
+        </div>
+    </div>
+
+    <div class="mt-2">
+        <div class="form-group">
+            <label asp-for="Keywords"></label>
+            <input class="form-control" asp-for="Keywords" type="text" />
+        </div>
+    </div>
+
+    <div class="color-2 mt-2">
+        <div class="form-group">
+            <label asp-for="DisciplinesIds"></label>
+            <select multiple class="form-control chosen-select" data-placeholder="Оберіть дисципліну" asp-for="DisciplinesIds">
+                @foreach(var d in disciplines){
+                    <option value="@d.Id">@d.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="color-1 mt-2">
+        <div class="form-group">
+            <label asp-for="AuthorIds"></label>
+            <select multiple class="form-control chosen-select" data-placeholder="Оберіть автора" asp-for="AuthorIds">
+                @foreach (var a in authors)
+                {
+                    <option value="@a.Id">@a.LastName @a.FirstName @a.MiddleName</option>
+                }
+            </select>
+        </div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Створити</button>
+</form>
+
+@section scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.chosen-select').chosen();
+        });
+    </script>
+}
+
+    
