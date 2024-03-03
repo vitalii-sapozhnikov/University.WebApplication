@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Models.Roles;
+using University.Web.Services;
 using University.Web.Services.Contracts;
 
 namespace University.Web.Controllers
@@ -26,6 +28,16 @@ namespace University.Web.Controllers
 
 
             return View((resultAuthors.Data, resultDepartments.Data.Where(d => d.DepartmentId != 0).ToList()));
+        }
+
+        [AuthorizeSession(Roles.HeadOfDepartment)]
+        [HttpGet("work")]
+        public async Task<IActionResult> Work()
+        {
+            var publications = await _apiService.GetDepartmentalPublicationsAsync();
+            if(publications == null)
+                return BadRequest();
+            return View(publications);
         }
     }
 }

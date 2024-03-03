@@ -11,35 +11,35 @@
         border: none;
     }
 
-        .chosen-container-multi .chosen-choices {
-            background-image: none;
-            padding: 7px;
-            border: none !important;
-            border-radius: 4px;
-            -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
-            box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+    .chosen-container-multi .chosen-choices {
+        background-image: none;
+        padding: 7px;
+        border: none !important;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .chosen-container-multi .chosen-choices li.search-choice {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        padding-top: 7px;
+        padding-bottom: 7px;
+        padding-left: 10px;
+        padding-right: 26px;
+        border: none;
+        background-image: none;
+    }
+
+        .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+            top: 9px;
+            right: 8px;
         }
 
-            .chosen-container-multi .chosen-choices li.search-choice {
-                -webkit-box-shadow: none;
-                box-shadow: none;
-                padding-top: 7px;
-                padding-bottom: 7px;
-                padding-left: 10px;
-                padding-right: 26px;
-                border: none;
-                background-image: none;
-            }
-
-                .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
-                    top: 9px;
-                    right: 8px;
-                }
-
-            .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
-                height: 32px;
-                font-size: 14px;
-            }
+    .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+        height: 32px;
+        font-size: 14px;
+    }
 
     .chosen-container .chosen-drop {
         border: none !important;
@@ -51,7 +51,6 @@
         box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.2) !important;
     }
 
-    /*Colors*/
     .color-1 .chosen-container-multi .chosen-choices li.search-choice {
         background-color: #e5e4cc;
     }
@@ -69,106 +68,233 @@
 <h3>Додати наукову статтю</h3>
 <hr />
 <form asp-action="UploadScientificPublication" method="post">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label asp-for="Title"></label>
-                <input asp-for="Title" type="text" class="form-control">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Title"></label>
+                    <input asp-for="Title" type="text" class="form-control" required>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label asp-for="Language"></label>
+                    <select class="form-select" asp-for="Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label asp-for="Volume"></label>
+                    <input class="form-control" asp-for="Volume" min="1" required/>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label asp-for="PublicationDate"></label>
+                    <input class="form-control" asp-for="PublicationDate" type="date" required />
+                </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label asp-for="Language"></label>
-                <select class="form-select" asp-for="Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
+        <div class="row mt-2">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label asp-for="JournalDetails"></label>
+                    <input class="form-control" asp-for="JournalDetails" required/>
+                </div>
             </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label asp-for="Volume"></label>
-                <input class="form-control" asp-for="Volume" />
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label asp-for="PublicationDate"></label>
-                <input class="form-control" asp-for="PublicationDate" type="date" />
-            </div>
-        </div>
-    </div>
-    <div class="row mt-2">
-        <div class="col-md-8">
-            <div class="form-group">
-                <label asp-for="JournalDetails"></label>
-                <input class="form-control" asp-for="JournalDetails" />
-            </div>
-        </div>
 
-        <div class="col-md-2">
-            <div class="form-group">
-                <label asp-for="JournalType"></label>
-                <select class="form-select" asp-for="JournalType" asp-items="Html.GetEnumSelectList<JournalType>()"></select>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label asp-for="JournalType"></label>
+                    <select class="form-select" asp-for="JournalType" asp-items="Html.GetEnumSelectList<JournalType>()"></select>
+                </div>
             </div>
-        </div>
 
-        <div class="col-md-2">
-            <div class="form-group">
-                <label asp-for="DOI"></label>
-                <input class="form-control" asp-for="DOI" />
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label asp-for="DOI"></label>
+                    <input class="form-control" asp-for="DOI" required />
+                </div>
             </div>
-        </div>
         
-    </div>
-    <div class="mt-2">
-        <div class="form-group">
-            <label asp-for="Abstract"></label>
-            <textarea class="form-control" asp-for="Abstract" type="text" rows="3"></textarea>
         </div>
-    </div>
-    <div class="mt-2">
-        <div class="form-group">
-            <label asp-for="Description"></label>
-            <textarea class="form-control" asp-for="Description" type="text" rows="3"></textarea>
-        </div>
-    </div>
 
-    <div class="mt-2">
-        <div class="form-group">
-            <label asp-for="Keywords"></label>
-            <input class="form-control" asp-for="Keywords" type="text" />
-        </div>
-    </div>
+        <div class="mt-2 row">
+            <div class="form-group col-md-6">
+                <label asp-for="AuthorIds"></label>
+                <select multiple class="form-control" data-placeholder="Оберіть автора" asp-for="AuthorIds" id="AuthorsSelect" required>
+                    @foreach (var a in authors)
+                    {
+                        <option value="@a.Id">@a.LastName @a.FirstName @a.MiddleName</option>
+                    }
+                </select>
 
-    <div class="color-2 mt-2">
-        <div class="form-group">
-            <label asp-for="DisciplinesIds"></label>
-            <select multiple class="form-control chosen-select" data-placeholder="Оберіть дисципліну" asp-for="DisciplinesIds">
-                @foreach(var d in disciplines){
-                    <option value="@d.Id">@d.Name</option>
-                }
-            </select>
-        </div>
-    </div>
+                <a class="link-dark" href="#" data-bs-toggle="modal" data-bs-target="#addAuthorModal">
+                    Додати стороннього автора
+                </a>
 
-    <div class="color-1 mt-2">
-        <div class="form-group">
-            <label asp-for="AuthorIds"></label>
-            <select multiple class="form-control chosen-select" data-placeholder="Оберіть автора" asp-for="AuthorIds">
-                @foreach (var a in authors)
-                {
-                    <option value="@a.Id">@a.LastName @a.FirstName @a.MiddleName</option>
-                }
-            </select>
+                <div class="modal" id="addAuthorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Додати стороннього автора</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true"></span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="addSurname">Прізвище</label>
+                                            <input class="form-control" type="text" name="addSurname" id="addSurname" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="addName">Ім'я</label>
+                                            <input class="form-control" type="text" name="addName" id="addName" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2">
+                                    <div class="form-group">
+                                        <label for="addMiddleName">По-батькові</label>
+                                        <input class="form-control" type="text" name="addMiddleName" id="addMiddleName" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" id="addAuthor" class="btn btn-primary">Додати</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group col-md-6">
+                <label asp-for="DisciplinesIds"></label>
+                <select multiple class="form-control" data-placeholder="Оберіть дисципліну" asp-for="DisciplinesIds" id="DisciplinesSelect" required>
+                    @foreach (var d in disciplines)
+                    {
+                        <option value="@d.Id">@d.Name</option>
+                    }
+                </select>
+            </div>
         </div>
-    </div>
+
+        <div class="mt-2">
+            <div class="form-group">
+                <label asp-for="Abstract"></label>
+                <textarea class="form-control" asp-for="Abstract" type="text" rows="3" required></textarea>
+            </div>
+        </div>
+        <div class="mt-2">
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea class="form-control" asp-for="Description" type="text" rows="3" required></textarea>
+            </div>
+        </div>
+
+        <div class="mt-2">
+            <div class="form-group">
+                <label asp-for="Keywords"></label>
+                <input class="form-control" asp-for="Keywords" type="text" required />
+            </div>
+        </div>    
     
-    <button type="submit" class="btn btn-primary">Створити</button>
+        <button type="submit" class="btn btn-primary mt-2">Створити</button>
+
+    </div>
 </form>
 
-@section scripts{
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@2.0.1/dist/js/multi-select-tag.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2/build/toastr.min.js" defer></script>
+
     <script>
+        new MultiSelectTag('DisciplinesSelect', {
+            rounded: true,    // default true
+            shadow: false,      // default false
+            placeholder: 'Пошук',  // default Search...
+            tagColor: {
+                textColor: '#327b2c',
+                borderColor: '#92e681',
+                bgColor: '#eaffe6',
+            },
+            onChange: function (values) {
+                console.log(values)
+            }
+        });
+
+        var authorsSelectTag = new MultiSelectTag('AuthorsSelect', {
+            rounded: true,    // default true
+            shadow: false,      // default false
+            placeholder: 'Пошук',  // default Search...
+            tagColor: {
+                textColor: '#327b2c',
+                borderColor: '#92e681',
+                bgColor: '#eaffe6',
+            },
+            onChange: function (values) {
+                console.log(values)
+            }
+        });
+
+
         $(document).ready(function () {
-            $('.chosen-select').chosen();
+            $('#addAuthor').click(function () {
+                var firstName = $('#addName').val();
+                var lastName = $('#addSurname').val();
+                var middleName = $('#addMiddleName').val();
+
+                var requestData = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    middleName: middleName
+                };
+
+                $.ajax({
+                    url: 'https://localhost:7249/api/people',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        $('#addAuthorModal').modal('toggle');
+
+                        $('#AuthorsSelect').append($('<option>', {
+                            value: response.id, // Assuming the response contains the ID of the newly added author
+                            text: response.lastName + ' ' + response.firstName + ' ' + response.middleName // Assuming the response contains the first and last name of the newly added author
+                        }));
+
+                        document.querySelector('.mult-select-tag').remove();
+                        new MultiSelectTag('AuthorsSelect', {
+                            rounded: true,    // default true
+                            shadow: false,      // default false
+                            placeholder: 'Пошук',  // default Search...
+                            tagColor: {
+                                textColor: '#327b2c',
+                                borderColor: '#92e681',
+                                bgColor: '#eaffe6',
+                            },
+                            onChange: function (values) {
+                                console.log(values)
+                            }
+                        });
+
+                        toastr.success('Сторонній автор успішно додано!');
+                    },
+                    error: function (xhr, status, error) {
+                        $('#addAuthorModal').modal('toggle');
+                        toastr.error('Виникла помилка: ' + error);
+                    }
+                });
+            });
         });
     </script>
 }

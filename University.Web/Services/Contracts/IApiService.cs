@@ -3,6 +3,8 @@ using Models.Models;
 using University.WebApi.Dtos.PersonDtos;
 using Microsoft.AspNetCore.Mvc;
 using University.WebApi.Dtos.MethodologicalPublicationDto;
+using University.WebApi.Dtos.ScientificPublicationDto;
+using University.WebApi.Dtos.WorkPlanDtos;
 
 namespace University.Web.Services.Contracts
 {
@@ -28,5 +30,9 @@ namespace University.Web.Services.Contracts
         Task<Result<string>> PostDisciplineAsync(string disciplineName);
         Task<List<GetPersonDto>?> GetPeopleAsync();
         Task<List<Discipline>?> GetDisciplinesListAsync();
+        Task PostScientificPublicationAsync(PostScientificPublicationDto publicationDto);
+        Task<List<Publication>?> GetDepartmentalPublicationsAsync();
+        Task<List<GetWorkPlan>?> GetWorkPlansListAsync();
+        Task<List<Publication>?> GetLecturerCorrelation(int lectId, int discId);
     }
 }

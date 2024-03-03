@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using University.WebApi.Contexts;
@@ -11,9 +12,11 @@ using University.WebApi.Contexts;
 namespace University.WebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221090611_WorkPlanGuarantorAdded")]
+    partial class WorkPlanGuarantorAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace University.WebApi.Migrations
 
                     b.HasIndex("LecturersId");
 
-                    b.ToTable("DepartmentLecturer", (string)null);
+                    b.ToTable("DepartmentLecturer");
                 });
 
             modelBuilder.Entity("DisciplinePublication", b =>
@@ -49,7 +52,7 @@ namespace University.WebApi.Migrations
 
                     b.HasIndex("PublicationsPublicationId");
 
-                    b.ToTable("DisciplinePublication", (string)null);
+                    b.ToTable("DisciplinePublication");
                 });
 
             modelBuilder.Entity("DisciplineWorkPlan", b =>
@@ -64,7 +67,7 @@ namespace University.WebApi.Migrations
 
                     b.HasIndex("WorkPlanId");
 
-                    b.ToTable("DisciplineWorkPlan", (string)null);
+                    b.ToTable("DisciplineWorkPlan");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -277,7 +280,7 @@ namespace University.WebApi.Migrations
 
                     b.HasKey("DepartmentId");
 
-                    b.ToTable("Departments", (string)null);
+                    b.ToTable("Departments");
 
                     b.HasData(
                         new
@@ -341,7 +344,7 @@ namespace University.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Disciplines", (string)null);
+                    b.ToTable("Disciplines");
 
                     b.HasData(
                         new
@@ -382,7 +385,7 @@ namespace University.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EducationYear", (string)null);
+                    b.ToTable("EducationYear");
                 });
 
             modelBuilder.Entity("Models.Models.LecturerDiscipline", b =>
@@ -403,7 +406,7 @@ namespace University.WebApi.Migrations
 
                     b.HasIndex("DisciplineId");
 
-                    b.ToTable("LecturerDisciplines", (string)null);
+                    b.ToTable("LecturerDisciplines");
                 });
 
             modelBuilder.Entity("Models.Models.Person", b =>
@@ -461,7 +464,7 @@ namespace University.WebApi.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Plans", (string)null);
+                    b.ToTable("Plans");
                 });
 
             modelBuilder.Entity("Models.Models.Publication", b =>
@@ -518,7 +521,7 @@ namespace University.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specialities", (string)null);
+                    b.ToTable("Specialities");
                 });
 
             modelBuilder.Entity("Models.Models.WorkPlan", b =>
@@ -558,7 +561,7 @@ namespace University.WebApi.Migrations
 
                     b.HasIndex("SpecialityId");
 
-                    b.ToTable("WorkPlans", (string)null);
+                    b.ToTable("WorkPlans");
                 });
 
             modelBuilder.Entity("PersonPublication", b =>
@@ -573,7 +576,7 @@ namespace University.WebApi.Migrations
 
                     b.HasIndex("PublicationsPublicationId");
 
-                    b.ToTable("PersonPublication", (string)null);
+                    b.ToTable("PersonPublication");
                 });
 
             modelBuilder.Entity("Models.Models.HeadOfDepartment", b =>

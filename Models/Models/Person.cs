@@ -16,7 +16,7 @@ namespace Models.Models
         [NotMapped]
         public string FullName { get => $"{LastName} {FirstName} {MiddleName}"; }
         [NotMapped]
-        public string ShortName { get => $"{LastName} {FirstName.First()}. {MiddleName.First()}."; }
+        public string ShortName { get => $"{LastName} {FirstName.FirstOrDefault()}. {MiddleName.FirstOrDefault()}."; }
 
 
         public string FirstName { get; set; }
@@ -26,5 +26,8 @@ namespace Models.Models
 
         // Many to many Publications
         public virtual ICollection<Publication> Publications { get; set; }
+
+        public string? ApplicationUserId { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

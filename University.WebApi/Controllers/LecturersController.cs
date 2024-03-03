@@ -117,5 +117,30 @@ namespace University.WebApi.Controllers
 
             return Ok(JsonConvert.SerializeObject(author, jsonSettings));
         }
+
+        [HttpGet("correlation")]
+        public async Task<IActionResult> GetLecturerCorrelation(int lectId, int discId)
+        {
+            var lecturer = await _dbContext.Lecturers
+                .Include(l => l.Publications) // Include the publications
+                    .ThenInclude(p => p.Disciplines) // Include the disciplines for each publication
+                .FirstOrDefaultAsync(l => l.Id == lectId);
+
+            if (lecturer == null) return NotFound();
+
+            var publications = lecturer.Publications
+                .Where(p => p.Disciplines.Any(d => d.Id == discId))
+                .ToList();
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+
+            string json = JsonConvert.SerializeObject(publications, Formatting.Indented, settings);
+
+            return Ok(json);
+        }
     }
 }

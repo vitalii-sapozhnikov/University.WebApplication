@@ -38,7 +38,7 @@ namespace University.WebApi.Controllers
         }
 
         // GET: api/<DisciplinesController>
-        [Authorize(Roles = "HeadOfDepartment")]
+        [Authorize(Roles = $"{Roles.HeadOfDepartment},{Roles.GuarantorOfSpeciality}")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {

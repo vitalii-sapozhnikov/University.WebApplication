@@ -29,7 +29,7 @@ namespace University.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetPersonDto>>> GetPersons()
         {
-            var people = await _context.Persons.ToListAsync();
+            var people = await _context.Persons.OrderBy(p => p.LastName).ToListAsync();
             var peopleDto = _mapper.Map<List<GetPersonDto>>(people);
             return peopleDto;
         }

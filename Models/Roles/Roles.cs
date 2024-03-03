@@ -15,5 +15,6 @@ namespace Models.Roles
         public const string Lecturer = "Lecturer";
         public const string HeadOfDepartment = "HeadOfDepartment";
         public const string EducationDepartment = "EducationDepartment";
+        public const string GuarantorOfSpeciality = "GuarantorOfSpeciality";
     }
 }

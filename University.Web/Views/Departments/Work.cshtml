@@ -1,0 +1,166 @@
+﻿@model List<Publication>
+
+<h3>Робота кафедри</h3>
+<hr />
+
+<div class="row mb-2">
+    <div class="col-auto"
+        <label>Початкова дата:</label>
+        <input class="form-control" type="text" id="min" name="min">
+    </div>
+    <div class="col-auto"
+        <label>Кінцева дата:</label>
+        <input class="form-control" type="text" id="max" name="max">
+    </div>
+    <div class="col-auto">
+        <label>Тип публікацій:</label>
+        <select class="form-select" id="typeColumnFilter">
+            <option value="">Усі</option>
+        </select>
+    </div>
+    <div id="methodicalFilterBlock" class="col-auto" style="display: none;">
+        <label>Тип методичних:</label>
+        <select class="form-select" id="methodicalColumnFilter">
+            <option value="">Усі</option>
+            @foreach (PublicationType t in Enum.GetValues(typeof(PublicationType)))
+            {
+                <option value="@t.GetDisplayName()">@t.GetDisplayName()</option>
+            }
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped" id="departmentalPublicationsTable">
+        <thead>
+            <tr>
+                <th class="col-md-6">Назва</th>
+                <th class="col-md-1">Тип</th>
+                <th class="col-md-2">Деталі</th>
+                <th>Автор</th>
+                <th>Дата</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var p in Model){
+                <tr>
+                    <td>@p.Title</td>
+                    @if(p is MethodologicalPublication mp){
+                        <td>Методична</td>
+                        <td>@mp.Type.GetDisplayName()</td>
+                    } else if (p is ScientificPublication sp) {
+                        <td>Наукова</td>
+                        <td>@sp.JournalType.GetDisplayName()</td>
+                    }
+                    <td>@(string.Join(", ", p.Authors.Select(a => $"{a.LastName} {a.FirstName} {a.MiddleName}").ToList()))</td>
+                    <td>@p.PublicationDate.Value.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/datetime/1.5.2/js/dataTables.dateTime.min.js"></script>
+    <script>
+        let minDate, maxDate;
+
+        DataTable.ext.search.push(function (settings, data, dataIndex) {
+            let min = minDate.val();
+            let max = maxDate.val();
+
+            var dateParts = data[4].split('.');
+            var date = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+
+
+            if (
+                (min === null && max === null) ||
+                (min === null && date <= max) ||
+                (min <= date && max === null) ||
+                (min <= date && date <= max)
+            ) {
+                return true;
+            }
+            return false;
+        });
+
+        minDate = new DateTime('#min', {
+            format: 'DD.MM.YYYY'
+        });
+        maxDate = new DateTime('#max', {
+            format: 'DD.MM.YYYY'
+        });
+
+
+        let table = $('#departmentalPublicationsTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/uk.json",
+                "datetime": {
+                    "weekdays": [
+                        "Нд",
+                        "Пн",
+                        "Вт",
+                        "Ср",
+                        "Чт",
+                        "Пт",
+                        "Сб"
+                    ]
+                },
+                "info": "Усього публікацій: _TOTAL_",
+            },
+            "dom": "iftlp",
+            "columnDefs": [
+                {
+                    "targets": [4], // Assuming the date column is at index 4 (zero-based index)
+                    "type": "date-eu", // Set the type to date for custom sorting
+                    "render": function (data, type, full, meta) {
+                        // Split the date string into day, month, and year components
+                        var dateParts = data.split('.');
+
+                        // Create a new Date object with the components in the correct order
+                        var parsedDate = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+
+                        // Check if the rendering type is sorting or filtering
+                        if (type === 'sort' || type === 'type') {
+                            return parsedDate.getTime(); // Return the timestamp for sorting purposes
+                        } else {
+                            return parsedDate.toLocaleDateString(); // Return the formatted date string for display
+                        }
+                    }
+                }
+            ]                
+        });
+
+        var values = table.column(1).data().unique().sort().toArray();
+
+        var typeSelect = $('#typeColumnFilter');
+        values.forEach(function (value) {
+            typeSelect.append('<option value="' + value + '">' + value + '</option>');
+        });
+
+        typeSelect.on('change', function () {
+            var selectedValue = $(this).val();
+            table.column(1).search(selectedValue).draw();
+
+            if (selectedValue === "Методична") {
+                $('#methodicalFilterBlock').show();
+                $('#methodicalColumnFilter').val("").trigger('change');;
+            } else {
+                $('#methodicalFilterBlock').hide();
+                $('#methodicalColumnFilter').val("").trigger('change');;
+            }
+
+        });
+
+        var methodicalSelect = $('#methodicalColumnFilter');
+        methodicalSelect.on('change', function () {
+            var selectedValue = $(this).val();
+            table.column(2).search(selectedValue).draw();
+        });
+
+        document.querySelectorAll('#min, #max').forEach((el) => {
+            el.addEventListener('change', () => table.draw());
+        });
+    </script>
+}

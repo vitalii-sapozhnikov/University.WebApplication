@@ -1,0 +1,50 @@
+﻿@using University.WebApi.Dtos.WorkPlanDtos
+@model List<GetWorkPlan>
+@{
+    var lastWorkPlan = Model.OrderByDescending(w => w.EducationYear.EndDate).First();
+}
+
+<h3>@lastWorkPlan.Speciality.Name, @lastWorkPlan.Course курс, @lastWorkPlan.PreparationLevel.GetDisplayName()</h3>
+<hr />
+
+<div class="accordion" id="accordionDisciplines">
+    @foreach (var d in lastWorkPlan.Disciplines)
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-@d.Id">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@d.Id" aria-expanded="false" aria-controls="collapse-@d.Id">
+                    @d.Name
+                </button>
+            </h2>
+            <div id="collapse-@d.Id" class="accordion-collapse collapse" aria-labelledby="heading-@d.Id" data-bs-parent="#accordionDisciplines" style="">
+                <table class="table table-responsive table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-auto">ПІБ</th>
+                            <th>Посада</th>
+                            <th class="col-md-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ld in d.LecturerDisciplines)
+                        {
+                            <tr>
+                                <td>@ld.Lecturer.FullName</td>
+                                <td>@ld.Lecturer.AcademicTitle.GetDisplayName()</td>
+                                <td>
+                                    <a class="btn btn-primary" 
+                                       asp-controller="Lecturers"
+                                       asp-action="Correlation"
+                                       asp-route-lectId="@ld.Lecturer.Id"
+                                       asp-route-discId="@d.Id">
+                                        Кореляція
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

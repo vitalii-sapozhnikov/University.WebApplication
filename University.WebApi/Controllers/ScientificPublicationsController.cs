@@ -88,6 +88,8 @@ namespace University.WebApi.Controllers
         {
             ScientificPublication entity = _mapper.Map<ScientificPublication>(scientificPublicationDto);
 
+            entity.PublicationDate = DateTime.SpecifyKind(entity.PublicationDate.Value, DateTimeKind.Utc);
+
             var authors = await _context.Persons.Where(p => scientificPublicationDto.AuthorIds.Contains(p.Id)).ToListAsync();
             entity.Authors = new List<Person>();
             entity.Authors.AddRange(authors);

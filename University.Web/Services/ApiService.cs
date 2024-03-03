@@ -7,6 +7,8 @@ using Models.Models;
 using University.WebApi.Dtos.PersonDtos;
 using Microsoft.AspNetCore.Mvc;
 using University.WebApi.Dtos.MethodologicalPublicationDto;
+using University.WebApi.Dtos.ScientificPublicationDto;
+using University.WebApi.Dtos.WorkPlanDtos;
 
 namespace University.Web.Services
 {
@@ -135,6 +137,25 @@ namespace University.Web.Services
 
             var resultString = await result.Content.ReadAsStringAsync();
             return Result<string>.Ok(resultString);
+        }
+
+        public async Task<List<Publication>?> GetDepartmentalPublicationsAsync()
+        {
+            HttpClient client = GetClient();
+            string url = "api/publications/departmentalPublications";
+
+            var result = await client.GetAsync(url);
+            if(result.IsSuccessStatusCode)
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.All
+                };
+                string response = await result.Content.ReadAsStringAsync();
+                var publications = JsonConvert.DeserializeObject<List<Publication>>(response, settings);
+                return publications;
+            }
+            return null;
         }
 
 
@@ -289,6 +310,15 @@ namespace University.Web.Services
         }
 
         
+        // Scientific Publications Section
+        public async Task PostScientificPublicationAsync(PostScientificPublicationDto publicationDto)
+        {
+            var client = GetClient();
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(publicationDto), Encoding.UTF8, "application/json");
+
+            var result = await client.PostAsync("api/ScientificPublications", jsonContent);
+        }
+
 
 
         // Departments Section
@@ -380,6 +410,33 @@ namespace University.Web.Services
                 return Result<string>.Ok("ok");
             }
             return Result<string>.Fail($"Failed to add discipline. Status code: {result.StatusCode}");
+        }
+
+
+        // Work plans section
+        public async Task<List<GetWorkPlan>?> GetWorkPlansListAsync()
+        {
+            var client = GetClient();
+            var response = await client.GetAsync("api/WorkPlans/guarantor");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            var workPlans = JsonConvert.DeserializeObject<List<GetWorkPlan>>(content);
+            return workPlans;
+        }
+
+        public async Task<List<Publication>?> GetLecturerCorrelation(int lectId, int discId)
+        {
+            var client = GetClient();
+            var response = await client.GetAsync($"api/Lecturers/correlation?lectId={lectId}&discId={discId}");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
+
+            var publications = JsonConvert.DeserializeObject<List<Publication>>(content, settings);
+            return publications;
         }
     }
 

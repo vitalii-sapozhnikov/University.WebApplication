@@ -13,10 +13,7 @@ namespace Models.Models
     }
     public class Lecturer: Person
     {        
-        public AcademicTitle AcademicTitle { get; set; }        
-
-        // One to one ApplicationUser
-        public ApplicationUser ApplicationUser { get; set; }
+        public AcademicTitle AcademicTitle { get; set; }   
 
         // Many to many Department
         public ICollection<Department> Departments { get; set; }

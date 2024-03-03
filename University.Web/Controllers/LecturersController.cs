@@ -78,4 +78,26 @@ public class LecturersController : Controller
         return BadRequest();
     }
 
+    [HttpGet("correlation")]
+    public async Task<IActionResult> Correlation(int lectId, int discId)
+    {
+        var result = await apiService.GetPeopleAsync();
+        var person = result?.FirstOrDefault(l => l.Id == lectId);
+        if (person == null)
+            return NotFound();
+
+        var disciplines = await apiService.GetDisciplinesListAsync();
+        var discipline = disciplines?.FirstOrDefault(l => l.Id == discId);
+        if (discipline == null)
+            return NotFound();
+
+
+        ViewBag.LecturerName = $"{person.LastName} {person.FirstName} {person.MiddleName}";
+        ViewBag.DisciplineName = discipline.Name;
+
+        var publications = await apiService.GetLecturerCorrelation(lectId, discId);
+
+        return View(publications);
+    }
+
 }

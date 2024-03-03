@@ -16,12 +16,16 @@ namespace Models.Models
         public int SpecialityId { get; set; }
         public int DepartmentId { get; set; }
         public int EducationYearId { get; set; }
+        public string GuarantorId { get; set; }
+
 
 
         // Navigation Properties
         public Speciality Speciality { get; set; }
         public Department Department { get; set; }
         public EducationYear EducationYear { get; set; }
+        public ApplicationUser Guarantor { get; set; }
+
 
 
         // Collection navigation property for disciplines
@@ -31,6 +35,5 @@ namespace Models.Models
         // Other Properties
         public int Course { get; set; }
         public PreparationLevel PreparationLevel { get; set; }
-
     }
 }

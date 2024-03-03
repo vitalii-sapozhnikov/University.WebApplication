@@ -268,7 +268,12 @@ namespace University.Web.Controllers
         [HttpPost("upload-scientific")]
         public async Task<IActionResult> UploadScientificPublication(PostScientificPublicationDto publicationDto)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+                return View(publicationDto);
+
+            await apiService.PostScientificPublicationAsync(publicationDto);
+
+            return RedirectToAction("All");
         }
     }   
 

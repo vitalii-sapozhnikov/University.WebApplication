@@ -28,7 +28,7 @@ namespace University.WebApi.Services
             var identityUser = new ApplicationUser
             {
                 UserName = user.Email,
-                Email = user.Email                
+                Email = user.Email
             };
 
             var result = await _userManager.CreateAsync(identityUser, user.Password);

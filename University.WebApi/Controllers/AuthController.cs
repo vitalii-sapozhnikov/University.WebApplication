@@ -32,41 +32,41 @@ namespace University.WebApi.Controllers
             var (success, error) = await _authService.RegisterUser(user);
                       
 
-            if (success)
-            {
-                switch (user.Role)
-                {
-                    case Roles.Lecturer:
-                        Lecturer lecturer = new Lecturer
-                        {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            MiddleName = user.MiddleName,
-                            ApplicationUser = await _authService.GetUser(user.Email),
-                            Departments = { _appDbContext.Departments.First(d => d.DepartmentId == user.DepartmentId) }
-                        };
+            //if (success)
+            //{
+            //    switch (user.Role)
+            //    {
+            //        case Roles.Lecturer:
+            //            Lecturer lecturer = new Lecturer
+            //            {
+            //                FirstName = user.FirstName,
+            //                LastName = user.LastName,
+            //                MiddleName = user.MiddleName,
+            //                ApplicationUser = await _authService.GetUser(user.Email),
+            //                Departments = { _appDbContext.Departments.First(d => d.DepartmentId == user.DepartmentId) }
+            //            };
 
-                        await _appDbContext.Lecturers.AddAsync(lecturer);
-                        await _appDbContext.SaveChangesAsync();
-                        break;
+            //            await _appDbContext.Lecturers.AddAsync(lecturer);
+            //            await _appDbContext.SaveChangesAsync();
+            //            break;
 
-                    case Roles.HeadOfDepartment:
-                        HeadOfDepartment headOfDepartment = new HeadOfDepartment
-                        {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            MiddleName = user.MiddleName,
-                            ApplicationUser = await _authService.GetUser(user.Email),
-                            DepartmentId = user.DepartmentId,
-                        }; 
+            //        case Roles.HeadOfDepartment:
+            //            HeadOfDepartment headOfDepartment = new HeadOfDepartment
+            //            {
+            //                FirstName = user.FirstName,
+            //                LastName = user.LastName,
+            //                MiddleName = user.MiddleName,
+            //                ApplicationUser = await _authService.GetUser(user.Email),
+            //                DepartmentId = user.DepartmentId,
+            //            }; 
                         
-                        await _appDbContext.HeadsOfDepartments.AddAsync(headOfDepartment);
-                        await _appDbContext.SaveChangesAsync();
-                        break;
-                }
+            //            await _appDbContext.HeadsOfDepartments.AddAsync(headOfDepartment);
+            //            await _appDbContext.SaveChangesAsync();
+            //            break;
+            //    }
 
+            //}
                 return Ok("Successfully done");
-            }
 
             // Return a more detailed error message
             return BadRequest($"Registration failed. Error: {error}");

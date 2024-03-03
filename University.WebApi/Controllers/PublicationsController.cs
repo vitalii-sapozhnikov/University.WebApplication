@@ -13,6 +13,8 @@ using University.WebApi.Contexts;
 using University.WebApi.Mapping;
 using University.WebApi.Dtos.MethodologicalPublicationDto;
 using AutoMapper;
+using Models.Roles;
+using University.WebApi.Services;
 
 namespace University.WebApi.Controllers
 {
@@ -23,12 +25,14 @@ namespace University.WebApi.Controllers
         private readonly AppDbContext _appDbContext;
         private UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly IApplicationUserService _applicationUser;
 
-        public PublicationsController(AppDbContext appDbContext, UserManager<ApplicationUser> userManager, IMapper mappper)
+        public PublicationsController(AppDbContext appDbContext, UserManager<ApplicationUser> userManager, IMapper mappper, IApplicationUserService applicationUserService)
         {
             _appDbContext = appDbContext;
             _userManager = userManager;
             _mapper = mappper;
+            _applicationUser = applicationUserService;
         }
 
         [HttpGet]
@@ -231,6 +235,33 @@ namespace University.WebApi.Controllers
             await _appDbContext.SaveChangesAsync();
 
             return Ok();
+        }
+
+
+        [Authorize(Roles = Roles.HeadOfDepartment)]
+        [HttpGet("departmentalPublications")]
+        public async Task<IActionResult> GetDepartmentalPublications()
+        {            
+            string userEmail = User.FindFirstValue(ClaimTypes.Email) ?? "";
+            ApplicationUser? user = await _userManager.FindByEmailAsync(userEmail);
+
+            var head = await _appDbContext.HeadsOfDepartments.FirstOrDefaultAsync(h => h.ApplicationUser == user);
+            if(head == null) { return NotFound("User not found!"); }
+
+            var publications = await _appDbContext.Lecturers
+                .Where(l => l.Departments.Any(d => d.DepartmentId == head.DepartmentId))
+                .SelectMany(l => l.Publications)
+                .Where(p => p.isPublished)
+                .Include(p => p.Authors)
+                .ToListAsync();
+
+            var settings = new JsonSerializerSettings 
+            { 
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+
+            return Ok(JsonConvert.SerializeObject(publications, Formatting.Indented, settings));
         }
     }
 }

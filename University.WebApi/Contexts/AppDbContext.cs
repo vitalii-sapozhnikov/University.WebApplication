@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Models.Models;
+using System.Reflection.Emit;
 
 namespace University.WebApi.Contexts
 {
@@ -59,6 +60,19 @@ namespace University.WebApi.Contexts
             builder.Entity<WorkPlan>()
                 .HasMany(wp => wp.Disciplines)
                 .WithMany(); // Assuming you don't need additional navigation properties or configuration here
+
+            builder.Entity<ApplicationUser>()
+                .HasOne(au => au.Person)
+                .WithOne(p => p.ApplicationUser)
+                .HasForeignKey<Person>(p => p.ApplicationUserId)
+                .IsRequired(false);
+
+            builder.Entity<Person>()
+                .HasOne(p => p.ApplicationUser)
+                .WithOne(au => au.Person)
+                .HasForeignKey<Person>(p => p.ApplicationUserId)
+                .IsRequired(false);
+
 
             base.OnModelCreating(builder);
         }

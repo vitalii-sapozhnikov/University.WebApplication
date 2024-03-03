@@ -25,6 +25,16 @@ namespace University.WebApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Password.RequiredLength = 8;
@@ -38,6 +48,8 @@ namespace University.WebApi
                 options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
             builder.Services.AddTransient<IAuthService, AuthService>();
+
+            builder.Services.AddTransient<IApplicationUserService, ApplicationUserService>();
 
             builder.Services.AddAuthentication(options =>
             {
@@ -61,12 +73,15 @@ namespace University.WebApi
 
             var app = builder.Build();
 
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseCors();
 
             app.UseHttpsRedirection();
 
@@ -89,7 +104,7 @@ namespace University.WebApi
                 var roleManager = scopedProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
                 // Add roles here
-                var roles = new List<string> { Roles.Admin, Roles.User, Roles.Lecturer, Roles.HeadOfDepartment, Roles.EducationDepartment };
+                var roles = new List<string> { Roles.Admin, Roles.User, Roles.Lecturer, Roles.HeadOfDepartment, Roles.EducationDepartment, Roles.GuarantorOfSpeciality };
 
                 foreach (var role in roles)
                 {
