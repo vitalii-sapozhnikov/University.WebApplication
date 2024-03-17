@@ -8,6 +8,7 @@ using Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Newtonsoft.Json;
 
 namespace University.WebApi.Controllers
 {
@@ -98,7 +99,12 @@ namespace University.WebApi.Controllers
                     UserRole = roles.First()
                 };
 
-                return Ok(response);
+                JsonSerializerSettings settings = new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+
+                return Ok(JsonConvert.SerializeObject(response, Formatting.Indented, settings));
             }
 
             // Return a more detailed error message

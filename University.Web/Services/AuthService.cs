@@ -33,9 +33,9 @@ namespace University.Web.Services
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JObject.Parse(responseContent);
 
-                var token = jsonResponse["token"]?.ToString();
-                var userInfo = jsonResponse["userInfo"]?.ToObject<ApplicationUser>();
-                var userRole = jsonResponse["userRole"]?.ToObject<string>();
+                var token = jsonResponse["Token"]?.ToString();
+                var userInfo = jsonResponse["UserInfo"]?.ToObject<ApplicationUser>();
+                var userRole = jsonResponse["UserRole"]?.ToObject<string>();
 
                 if (!string.IsNullOrEmpty(token) && userInfo != null && !string.IsNullOrEmpty(userRole))
                 {

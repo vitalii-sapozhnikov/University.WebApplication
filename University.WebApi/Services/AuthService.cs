@@ -5,6 +5,7 @@ using Models.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using University.WebApi.Contexts;
 
 namespace University.WebApi.Services
 {
@@ -13,12 +14,14 @@ namespace University.WebApi.Services
         private UserManager<ApplicationUser> _userManager;
         private RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _config;
+        private readonly AppDbContext _appDbContext;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration config)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration config, AppDbContext appDbContext)
         {
             _userManager = userManager;
             _config = config;
             _roleManager = roleManager;
+            _appDbContext = appDbContext;
         }
 
        
@@ -125,6 +128,7 @@ namespace University.WebApi.Services
 
             if (signInResult)
             {
+                identityUser.Person = _appDbContext.Persons.First(p => p.ApplicationUser == identityUser);
                 return (identityUser); // Success
             }
 

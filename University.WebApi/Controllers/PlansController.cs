@@ -99,8 +99,11 @@ namespace University.WebApi.Controllers
                         .First(h => h.ApplicationUser == user).Id;
                     break;
                 case Roles.Lecturer:
-                    departmentId = appDbContext.Lecturers
-                        .First(h => h.ApplicationUser == user).Departments.First().DepartmentId;
+                    var lecturer = appDbContext.Lecturers
+                        .Include(l => l.Departments)
+                        .First(h => h.ApplicationUser == user);
+                    var department = lecturer.Departments.First();
+                    departmentId = department.DepartmentId;
                     userId = appDbContext.Lecturers
                         .First(h => h.ApplicationUser == user).Id;
                     break;

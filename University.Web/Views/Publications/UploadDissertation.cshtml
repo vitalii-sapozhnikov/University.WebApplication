@@ -4,6 +4,9 @@
 @{
     List<Discipline> disciplines = ViewBag.Disciplines;
     List<GetPersonDto> authors = ViewBag.Authors;
+
+    bool authorized = SessionService.isAuthorized;
+    var (user, role) = SessionService.GetUser();
 }
 
 <style>
@@ -132,7 +135,14 @@
                 <select multiple class="form-control" data-placeholder="Оберіть автора" asp-for="AuthorIds" id="AuthorsSelect" required>
                     @foreach (var a in authors)
                     {
-                        <option value="@a.Id">@a.LastName @a.FirstName @a.MiddleName</option>
+                        if (a.Id == user.Person.Id)
+                        {
+                            <option selected value="@a.Id">@a.LastName @a.FirstName @a.MiddleName</option>
+                        }
+                        else
+                        {
+                            <option value="@a.Id">@a.LastName @a.FirstName @a.MiddleName</option>
+                        }
                     }
                 </select>
 
