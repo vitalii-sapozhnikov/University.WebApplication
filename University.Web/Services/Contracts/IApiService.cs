@@ -30,9 +30,13 @@ namespace University.Web.Services.Contracts
         Task<Result<string>> PostDisciplineAsync(string disciplineName);
         Task<List<GetPersonDto>?> GetPeopleAsync();
         Task<List<Discipline>?> GetDisciplinesListAsync();
-        Task PostScientificPublicationAsync(PostScientificPublicationDto publicationDto);
+        Task PostScientificPublicationAsync(PostScientificArticleDto publicationDto);
         Task<List<Publication>?> GetDepartmentalPublicationsAsync();
         Task<List<GetWorkPlan>?> GetWorkPlansListAsync();
         Task<List<Publication>?> GetLecturerCorrelation(int lectId, int discId);
+        Task PostScientificMonographAsync(PostScientificMonographDto publicationDto);
+        Task PostScientificDissertationAsync(PostScientificDissertationDto publicationDto);
+        Task PostScientificPatentAsync(PostScientificPatentDto publicationDto);
+        Task PostScientificConferenceThesesAsync(PostScientificConferenceThesesDto publicationDto);
     }
 }

@@ -255,7 +255,7 @@ namespace University.Web.Controllers
         {
             var disciplines = (await apiService.GetDisciplinesListAsync());
             var authors = await apiService.GetPeopleAsync();
-            var publication = new PostScientificPublicationDto();
+            var publication = new PostScientificArticleDto();
             publication.PublicationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
 
             ViewBag.Disciplines = disciplines;
@@ -266,7 +266,7 @@ namespace University.Web.Controllers
 
         [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
         [HttpPost("upload-scientific")]
-        public async Task<IActionResult> UploadScientificPublication(PostScientificPublicationDto publicationDto)
+        public async Task<IActionResult> UploadScientificPublication(PostScientificArticleDto publicationDto)
         {
             if (!ModelState.IsValid)
                 return View(publicationDto);
@@ -275,6 +275,123 @@ namespace University.Web.Controllers
 
             return RedirectToAction("All");
         }
+
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("upload-monograph")]
+        public async Task<IActionResult> UploadMonograph()
+        {
+            var disciplines = (await apiService.GetDisciplinesListAsync());
+            var authors = await apiService.GetPeopleAsync();
+            var publication = new PostScientificMonographDto();
+            publication.PublicationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+
+            ViewBag.Disciplines = disciplines;
+            ViewBag.Authors = authors;
+
+            return View(publication);
+        }
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpPost("upload-monograph")]
+        public async Task<IActionResult> UploadMonograph(PostScientificMonographDto publicationDto)
+        {
+            if (!ModelState.IsValid)
+                return View(publicationDto);
+
+            await apiService.PostScientificMonographAsync(publicationDto);
+
+            return RedirectToAction("All");
+        }
+
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("upload-dissertation")]
+        public async Task<IActionResult> UploadDissertation()
+        {
+            var disciplines = (await apiService.GetDisciplinesListAsync());
+            var authors = await apiService.GetPeopleAsync();
+            var publication = new PostScientificDissertationDto();
+            publication.PublicationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+
+            ViewBag.Disciplines = disciplines;
+            ViewBag.Authors = authors;
+
+            return View(publication);
+        }
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpPost("upload-dissertation")]
+        public async Task<IActionResult> UploadDissertation(PostScientificDissertationDto publicationDto)
+        {
+            if (!ModelState.IsValid)
+                return View(publicationDto);
+
+            await apiService.PostScientificDissertationAsync(publicationDto);
+
+            return RedirectToAction("All");
+        }
+
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("upload-patent")]
+        public async Task<IActionResult> UploadPatent()
+        {
+            var disciplines = (await apiService.GetDisciplinesListAsync());
+            var authors = await apiService.GetPeopleAsync();
+            var publication = new PostScientificPatentDto();
+            publication.PublicationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+
+            ViewBag.Disciplines = disciplines;
+            ViewBag.Authors = authors;
+
+            return View(publication);
+        }
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpPost("upload-patent")]
+        public async Task<IActionResult> UploadPatent(PostScientificPatentDto publicationDto)
+        {
+            if (!ModelState.IsValid)
+                return View(publicationDto);
+
+            await apiService.PostScientificPatentAsync(publicationDto);
+
+            return RedirectToAction("All");
+        }
+
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("upload-conference-theses")]
+        public async Task<IActionResult> UploadConferenceTheses()
+        {
+            var disciplines = (await apiService.GetDisciplinesListAsync());
+            var authors = await apiService.GetPeopleAsync();
+            var publication = new PostScientificConferenceThesesDto();
+            publication.PublicationDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+
+            ViewBag.Disciplines = disciplines;
+            ViewBag.Authors = authors;
+
+            return View(publication);
+        }
+
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpPost("upload-conference-theses")]
+        public async Task<IActionResult> UploadConferenceTheses(PostScientificConferenceThesesDto publicationDto)
+        {
+            if (!ModelState.IsValid)
+                return View(publicationDto);
+
+            await apiService.PostScientificConferenceThesesAsync(publicationDto);
+
+            return RedirectToAction("All");
+        }
+
+
+
+
+
     }   
 
 }

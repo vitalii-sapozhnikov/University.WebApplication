@@ -1,6 +1,6 @@
 ﻿@using University.WebApi.Dtos.PersonDtos
 @using University.WebApi.Dtos.ScientificPublicationDto
-@model PostScientificArticleDto
+@model PostScientificDissertationDto
 @{
     List<Discipline> disciplines = ViewBag.Disciplines;
     List<GetPersonDto> authors = ViewBag.Authors;
@@ -11,35 +11,35 @@
         border: none;
     }
 
-    .chosen-container-multi .chosen-choices {
-        background-image: none;
-        padding: 7px;
-        border: none !important;
-        border-radius: 4px;
-        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
-        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .chosen-container-multi .chosen-choices li.search-choice {
-        -webkit-box-shadow: none;
-        box-shadow: none;
-        padding-top: 7px;
-        padding-bottom: 7px;
-        padding-left: 10px;
-        padding-right: 26px;
-        border: none;
-        background-image: none;
-    }
-
-        .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
-            top: 9px;
-            right: 8px;
+        .chosen-container-multi .chosen-choices {
+            background-image: none;
+            padding: 7px;
+            border: none !important;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
         }
 
-    .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
-        height: 32px;
-        font-size: 14px;
-    }
+            .chosen-container-multi .chosen-choices li.search-choice {
+                -webkit-box-shadow: none;
+                box-shadow: none;
+                padding-top: 7px;
+                padding-bottom: 7px;
+                padding-left: 10px;
+                padding-right: 26px;
+                border: none;
+                background-image: none;
+            }
+
+                .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+                    top: 9px;
+                    right: 8px;
+                }
+
+            .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+                height: 32px;
+                font-size: 14px;
+            }
 
     .chosen-container .chosen-drop {
         border: none !important;
@@ -65,9 +65,9 @@
 </style>
 
 
-<h3>Додати наукову статтю</h3>
+<h3>Монографія</h3>
 <hr />
-<form asp-action="UploadScientificPublication" method="post">
+<form asp-action="UploadDissertation" method="post">
     <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -85,7 +85,7 @@
             <div class="col-md-2">
                 <div class="form-group">
                     <label asp-for="Volume"></label>
-                    <input class="form-control" asp-for="Volume" min="1" required/>
+                    <input class="form-control" asp-for="Volume" min="1" required />
                 </div>
             </div>
             <div class="col-md-2">
@@ -98,15 +98,15 @@
         <div class="row mt-2">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label asp-for="JournalDetails"></label>
-                    <input class="form-control" asp-for="JournalDetails" required/>
+                    <label asp-for="URL"></label>
+                    <input class="form-control" asp-for="URL" />
                 </div>
             </div>
 
             <div class="col-md-2">
                 <div class="form-group">
-                    <label asp-for="JournalType"></label>
-                    <select class="form-select" asp-for="JournalType" asp-items="Html.GetEnumSelectList<JournalType>()"></select>
+                    <label asp-for="DissertationType"></label>
+                    <select class="form-select" asp-for="DissertationType" asp-items="Html.GetEnumSelectList<DissertationType>()"></select>
                 </div>
             </div>
 
@@ -123,16 +123,8 @@
                     <input class="form-control" asp-for="UDC" required />
                 </div>
             </div>
-        
-        </div>
 
-        <div class="row mt-2">
-            <div class="form-group">
-                <label asp-for="URL"></label>
-                <input class="form-control" asp-for="URL" />
-            </div>
         </div>
-
 
         <div class="mt-2 row">
             <div class="form-group col-md-6">
@@ -204,6 +196,13 @@
 
         <div class="mt-2">
             <div class="form-group">
+                <label asp-for="EducationalInstitution"></label>
+                <input class="form-control" asp-for="EducationalInstitution" required></input>
+            </div>
+        </div>
+
+        <div class="mt-2">
+            <div class="form-group">
                 <label asp-for="Abstract"></label>
                 <textarea class="form-control" asp-for="Abstract" type="text" rows="3" required></textarea>
             </div>
@@ -220,15 +219,15 @@
                 <label asp-for="Keywords"></label>
                 <input class="form-control" asp-for="Keywords" type="text" required />
             </div>
-        </div>    
-    
+        </div>
+
         <button type="submit" class="btn btn-primary mt-2">Створити</button>
 
     </div>
 </form>
 
 
-@section Scripts{
+@section Scripts {
     <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@2.0.1/dist/js/multi-select-tag.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastr@2/build/toastr.min.js" defer></script>
 
@@ -314,4 +313,3 @@
     </script>
 }
 
-    

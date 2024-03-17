@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using University.WebApi.Contexts;
@@ -11,9 +12,11 @@ using University.WebApi.Contexts;
 namespace University.WebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240303114515_ScientificArticleAdded")]
+    partial class ScientificArticleAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -617,26 +620,13 @@ namespace University.WebApi.Migrations
                     b.ToTable("MethodologicalPublications", (string)null);
                 });
 
-            modelBuilder.Entity("Models.Models.ScientificPublication", b =>
+            modelBuilder.Entity("Models.Models.ScientificArticle", b =>
                 {
                     b.HasBaseType("Models.Models.Publication");
 
                     b.Property<string>("DOI")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UDC")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string>("URL")
-                        .HasColumnType("text");
-
-                    b.ToTable("ScientificPublications", (string)null);
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificArticle", b =>
-                {
-                    b.HasBaseType("Models.Models.ScientificPublication");
 
                     b.Property<string>("JournalDetails")
                         .IsRequired()
@@ -646,65 +636,6 @@ namespace University.WebApi.Migrations
                         .HasColumnType("integer");
 
                     b.ToTable("ScientificArticles", (string)null);
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificConferenceTheses", b =>
-                {
-                    b.HasBaseType("Models.Models.ScientificPublication");
-
-                    b.Property<string>("ConferenceName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ConferencePlace")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("ScientificConferenceTheses", (string)null);
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificDissertation", b =>
-                {
-                    b.HasBaseType("Models.Models.ScientificPublication");
-
-                    b.Property<int>("DissertationType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("EducationalInstitution")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("ScientificDissertations", (string)null);
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificMonograph", b =>
-                {
-                    b.HasBaseType("Models.Models.ScientificPublication");
-
-                    b.Property<string>("ISBN")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Publisher")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("ScientificMonographs", (string)null);
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificPatent", b =>
-                {
-                    b.HasBaseType("Models.Models.ScientificPublication");
-
-                    b.Property<string>("Issuer")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PatentNo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("ScientificPatents", (string)null);
                 });
 
             modelBuilder.Entity("DepartmentLecturer", b =>
@@ -934,56 +865,11 @@ namespace University.WebApi.Migrations
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("Models.Models.ScientificPublication", b =>
+            modelBuilder.Entity("Models.Models.ScientificArticle", b =>
                 {
                     b.HasOne("Models.Models.Publication", null)
                         .WithOne()
-                        .HasForeignKey("Models.Models.ScientificPublication", "PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificArticle", b =>
-                {
-                    b.HasOne("Models.Models.ScientificPublication", null)
-                        .WithOne()
                         .HasForeignKey("Models.Models.ScientificArticle", "PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificConferenceTheses", b =>
-                {
-                    b.HasOne("Models.Models.ScientificPublication", null)
-                        .WithOne()
-                        .HasForeignKey("Models.Models.ScientificConferenceTheses", "PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificDissertation", b =>
-                {
-                    b.HasOne("Models.Models.ScientificPublication", null)
-                        .WithOne()
-                        .HasForeignKey("Models.Models.ScientificDissertation", "PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificMonograph", b =>
-                {
-                    b.HasOne("Models.Models.ScientificPublication", null)
-                        .WithOne()
-                        .HasForeignKey("Models.Models.ScientificMonograph", "PublicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Models.Models.ScientificPatent", b =>
-                {
-                    b.HasOne("Models.Models.ScientificPublication", null)
-                        .WithOne()
-                        .HasForeignKey("Models.Models.ScientificPatent", "PublicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

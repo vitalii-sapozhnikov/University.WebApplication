@@ -21,7 +21,46 @@ namespace University.WebApi.Mapping
             CreateMap<PostPersonDto, Person>();
 
             // Scientific publications
-            CreateMap<PostScientificPublicationDto, ScientificPublication>()
+            CreateMap<PostScientificArticleDto, ScientificArticle>()
+                .ForMember(dest => dest.Keywords, opt => opt.MapFrom(src =>
+                    src.Keywords != null
+                        ? src.Keywords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim()).ToArray()
+                        : null))
+                .ForMember(dest => dest.PublicationDate, opt => opt.MapFrom(src =>
+                    DateTime.SpecifyKind(src.PublicationDate, DateTimeKind.Utc)));
+
+            // Scientific monographs
+            CreateMap<PostScientificMonographDto, ScientificMonograph>()
+                .ForMember(dest => dest.Keywords, opt => opt.MapFrom(src =>
+                    src.Keywords != null
+                        ? src.Keywords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim()).ToArray()
+                        : null))
+                .ForMember(dest => dest.PublicationDate, opt => opt.MapFrom(src =>
+                    DateTime.SpecifyKind(src.PublicationDate, DateTimeKind.Utc)));
+
+
+            // Scientific dissertation
+            CreateMap<PostScientificDissertationDto, ScientificDissertation>()
+                .ForMember(dest => dest.Keywords, opt => opt.MapFrom(src =>
+                    src.Keywords != null
+                        ? src.Keywords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim()).ToArray()
+                        : null))
+                .ForMember(dest => dest.PublicationDate, opt => opt.MapFrom(src =>
+                    DateTime.SpecifyKind(src.PublicationDate, DateTimeKind.Utc)));
+
+
+            // Scientific patent
+            CreateMap<PostScientificPatentDto, ScientificPatent>()
+                .ForMember(dest => dest.Keywords, opt => opt.MapFrom(src =>
+                    src.Keywords != null
+                        ? src.Keywords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim()).ToArray()
+                        : null))
+                .ForMember(dest => dest.PublicationDate, opt => opt.MapFrom(src =>
+                    DateTime.SpecifyKind(src.PublicationDate, DateTimeKind.Utc)));
+
+
+            // Scientific conference theses
+            CreateMap<PostScientificConferenceThesesDto, ScientificConferenceTheses>()
                 .ForMember(dest => dest.Keywords, opt => opt.MapFrom(src =>
                     src.Keywords != null
                         ? src.Keywords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim()).ToArray()

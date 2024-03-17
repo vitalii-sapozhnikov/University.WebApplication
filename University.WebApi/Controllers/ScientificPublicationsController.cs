@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Humanizer;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.Models;
@@ -32,16 +26,16 @@ namespace University.WebApi.Controllers
 
         // GET: api/ScientificPublications
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ScientificPublication>>> GetScientificPublications()
+        public async Task<ActionResult<IEnumerable<ScientificArticle>>> GetScientificPublications()
         {
-            return await _context.ScientificPublications.ToListAsync();
+            return await _context.ScientificArticles.ToListAsync();
         }
 
         // GET: api/ScientificPublications/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ScientificPublication>> GetScientificPublication(int id)
+        public async Task<ActionResult<ScientificArticle>> GetScientificPublication(int id)
         {
-            var scientificPublication = await _context.ScientificPublications.FindAsync(id);
+            var scientificPublication = await _context.ScientificArticles.FindAsync(id);
 
             if (scientificPublication == null)
             {
@@ -53,7 +47,7 @@ namespace University.WebApi.Controllers
 
         // PUT: api/ScientificPublications/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutScientificPublication(int id, ScientificPublication scientificPublication)
+        public async Task<IActionResult> PutScientificPublication(int id, ScientificArticle scientificPublication)
         {
             if (id != scientificPublication.PublicationId)
             {
@@ -84,9 +78,9 @@ namespace University.WebApi.Controllers
         // POST: api/ScientificPublications
         [Authorize(Roles = $"{Roles.Lecturer}, {Roles.HeadOfDepartment}")]
         [HttpPost]
-        public async Task<ActionResult<ScientificPublication>> PostScientificPublication(PostScientificPublicationDto scientificPublicationDto)
+        public async Task<ActionResult<ScientificArticle>> PostScientificPublication(PostScientificArticleDto scientificPublicationDto)
         {
-            ScientificPublication entity = _mapper.Map<ScientificPublication>(scientificPublicationDto);
+            ScientificArticle entity = _mapper.Map<ScientificArticle>(scientificPublicationDto);
 
             entity.PublicationDate = DateTime.SpecifyKind(entity.PublicationDate.Value, DateTimeKind.Utc);
 
@@ -98,7 +92,7 @@ namespace University.WebApi.Controllers
             entity.Disciplines = new List<Discipline>();
             entity.Disciplines.AddRange(disciplines);
 
-            _context.ScientificPublications.Add(entity);
+            _context.ScientificArticles.Add(entity);
             await _context.SaveChangesAsync();
 
             var json = JsonConvert.SerializeObject(entity, Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
@@ -111,13 +105,13 @@ namespace University.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteScientificPublication(int id)
         {
-            var scientificPublication = await _context.ScientificPublications.FindAsync(id);
+            var scientificPublication = await _context.ScientificArticles.FindAsync(id);
             if (scientificPublication == null)
             {
                 return NotFound();
             }
 
-            _context.ScientificPublications.Remove(scientificPublication);
+            _context.ScientificArticles.Remove(scientificPublication);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -125,7 +119,8 @@ namespace University.WebApi.Controllers
 
         private bool ScientificPublicationExists(int id)
         {
-            return _context.ScientificPublications.Any(e => e.PublicationId == id);
+            return _context.ScientificArticles.Any(e => e.PublicationId == id);
         }
+        
     }
 }

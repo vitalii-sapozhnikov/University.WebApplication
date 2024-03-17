@@ -311,7 +311,7 @@ namespace University.Web.Services
 
         
         // Scientific Publications Section
-        public async Task PostScientificPublicationAsync(PostScientificPublicationDto publicationDto)
+        public async Task PostScientificPublicationAsync(PostScientificArticleDto publicationDto)
         {
             var client = GetClient();
             var jsonContent = new StringContent(JsonConvert.SerializeObject(publicationDto), Encoding.UTF8, "application/json");
@@ -437,6 +437,38 @@ namespace University.Web.Services
 
             var publications = JsonConvert.DeserializeObject<List<Publication>>(content, settings);
             return publications;
+        }
+
+        public async Task PostScientificMonographAsync(PostScientificMonographDto publicationDto)
+        {
+            var client = GetClient();
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(publicationDto), Encoding.UTF8, "application/json");
+
+            var result = await client.PostAsync("api/ScientificMonographs", jsonContent);
+        }
+
+        public async Task PostScientificDissertationAsync(PostScientificDissertationDto publicationDto)
+        {
+            var client = GetClient();
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(publicationDto), Encoding.UTF8, "application/json");
+
+            var result = await client.PostAsync("api/ScientificDissertations", jsonContent);
+        }
+
+        public async Task PostScientificPatentAsync(PostScientificPatentDto publicationDto)
+        {
+            var client = GetClient();
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(publicationDto), Encoding.UTF8, "application/json");
+
+            var result = await client.PostAsync("api/ScientificPatents", jsonContent);
+        }
+
+        public async Task PostScientificConferenceThesesAsync(PostScientificConferenceThesesDto publicationDto)
+        {
+            var client = GetClient();
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(publicationDto), Encoding.UTF8, "application/json");
+
+            var result = await client.PostAsync("api/ScientificConferenceTheses", jsonContent);
         }
     }
 

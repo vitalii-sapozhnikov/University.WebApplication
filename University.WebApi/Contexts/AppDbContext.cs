@@ -12,7 +12,11 @@ namespace University.WebApi.Contexts
         public DbSet<Person> Persons { get; set; }
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<Publication> Publications { get; set; }
-        public DbSet<ScientificPublication> ScientificPublications { get; set; }
+        public DbSet<ScientificArticle> ScientificArticles { get; set; }
+        public DbSet<ScientificMonograph> ScientificMonographs { get; set; }
+        public DbSet<ScientificDissertation> ScientificDissertations { get; set; }
+        public DbSet<ScientificPatent> ScientificPatents { get; set; }
+        public DbSet<ScientificConferenceTheses> ScientificConferenceTheses { get; set; }
         public DbSet<MethodologicalPublication> MethodologicalPublications { get; set; }
         public DbSet<Plan> Plans { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -52,7 +56,12 @@ namespace University.WebApi.Contexts
 
             builder.Entity<Person>().ToTable("Person");
             builder.Entity<MethodologicalPublication>().ToTable("MethodologicalPublications");
+            builder.Entity<ScientificArticle>().ToTable("ScientificArticles");
+            builder.Entity<ScientificMonograph>().ToTable("ScientificMonographs");
+            builder.Entity<ScientificDissertation>().ToTable("ScientificDissertations");
+            builder.Entity<ScientificPatent>().ToTable("ScientificPatents");
             builder.Entity<ScientificPublication>().ToTable("ScientificPublications");
+            builder.Entity<ScientificConferenceTheses>().ToTable("ScientificConferenceTheses");
 
             builder.Entity<Lecturer>().ToTable("Lecturers");
             builder.Entity<HeadOfDepartment>().ToTable("HeadsOfDepartments");
@@ -72,7 +81,6 @@ namespace University.WebApi.Contexts
                 .WithOne(au => au.Person)
                 .HasForeignKey<Person>(p => p.ApplicationUserId)
                 .IsRequired(false);
-
 
             base.OnModelCreating(builder);
         }

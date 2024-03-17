@@ -3,18 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace University.WebApi.Dtos.ScientificPublicationDto
 {
-    public class PostScientificPublicationDto
+    public class PostScientificPatentDto
     {
-        [Display(Name = "Тип журналу")]
-        public JournalType JournalType { get; set; }
-
-        [Display(Name = "Деталі журналу (назва, номер, серія, випуск)")]
-        public string JournalDetails { get; set; }
-
-        [Display(Name = "Посилання DOI")]
-        public string DOI { get; set; }
-
-        [Display(Name = "Назва статті")]
+        [Display(Name = "Назва патенту")]
         public string Title { get; set; }
 
         [Display(Name = "Дата")]
@@ -40,5 +31,20 @@ namespace University.WebApi.Dtos.ScientificPublicationDto
 
         [Display(Name = "Дисципліни")]
         public int[] DisciplinesIds { get; set; }
+
+        [Display(Name = "Організація, що видала патент")]
+        public string Issuer { get; set; }
+
+        [Display(Name = "Номер патенту")]
+        public string PatentNo { get; set; }
+
+        [Display(Name = "УДК")]
+        public string UDC { get; set; }
+
+        [Display(Name = "DOI")]
+        public string? DOI { get; set; }
+
+        [Display(Name = "URL")]
+        public string? URL { get; set; }
     }
 }
