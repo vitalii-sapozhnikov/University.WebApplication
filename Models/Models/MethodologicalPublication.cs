@@ -19,7 +19,8 @@ namespace Models.Models
         [Display(Name = "Методичні рекомендації")] MethodicalRecommendations,
         [Display(Name = "Хрестоматії")] Anthologies,
         [Display(Name = "Словники")] Dictionaries,
-        [Display(Name = "Довідники")] Handbooks
+        [Display(Name = "Довідники")] Handbooks,
+        [Display(Name = "Робоча програма")] WorkProgramme
     }
     public class MethodologicalPublication: Publication
     {
@@ -28,5 +29,8 @@ namespace Models.Models
 
         public int? PlanId { get; set; }
         public Plan Plan { get; set; }
+
+        public override string BibliographicReference =>
+            $"{string.Join(", ", Authors.Select(a => a.ShortName))}, {Title}: {Type?.GetDisplayName()}, {(PublicationDate.HasValue ? PublicationDate.Value.Year.ToString() : "")}. - {Volume} с.";
     }
 }

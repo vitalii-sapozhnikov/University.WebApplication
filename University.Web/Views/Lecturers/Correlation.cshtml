@@ -57,10 +57,14 @@
                         <td>Методична</td>
                         <td>@mp.Type.GetDisplayName()</td>
                     }
-                    else if (p is ScientificArticle sp)
+                    else if(p is ScientificPublication sp)
                     {
                         <td>Наукова</td>
-                        <td>@sp.JournalType.GetDisplayName()</td>
+                        if (sp is ScientificArticle sa){ <td>@sa.JournalType.GetDisplayName()</td> }
+                        else if (sp is ScientificConferenceTheses sct){ <td>Тези конференції</td> }
+                        else if (sp is ScientificDissertation sd){ <td>Дисертація</td> }
+                        else if (sp is ScientificMonograph sm){ <td>Монографія</td> }
+                        else if (sp is ScientificPatent spp){ <td>Патент</td> }
                     }
                     <td>@(string.Join(", ", p.Authors.Select(a => $"{a.LastName} {a.FirstName} {a.MiddleName}").ToList()))</td>
                     <td>@p.PublicationDate.Value.ToShortDateString()</td>

@@ -107,7 +107,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark">@user.Email</a>
+                                <a class="nav-link text-dark" asp-controller="Lecturers" asp-action="Index" asp-route-id="@user?.Person?.Id">@user.Email</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Вийти</a>

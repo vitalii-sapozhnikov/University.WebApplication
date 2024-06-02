@@ -15,6 +15,9 @@ using University.WebApi.Dtos.MethodologicalPublicationDto;
 using AutoMapper;
 using Models.Roles;
 using University.WebApi.Services;
+using iText.Commons.Actions.Contexts;
+using NuGet.Packaging;
+using static iText.IO.Util.IntHashtable;
 
 namespace University.WebApi.Controllers
 {
@@ -40,12 +43,18 @@ namespace University.WebApi.Controllers
             string? searchTerm,
             string? authorName,
             DateTime? startDateFilter,
-            DateTime? endDateFilter)
+            DateTime? endDateFilter,
+            string? categories)
         {
             IQueryable<Publication> query = _appDbContext.Publications.Include(p => p.Authors)
                 .Where(p => p.isPublished == true);
 
             // Apply filters based on the provided parameters
+            if (!string.IsNullOrEmpty(categories))
+            {
+                int[] categoryIds = categories?.Split(',').Select(int.Parse).ToArray();
+                query = query.Where(p => p.Disciplines.Any(d => categoryIds.Contains(d.Id)));
+            }
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 // Fuzzy search for Title, Description, Abstract, and Keywords
@@ -111,14 +120,14 @@ namespace University.WebApi.Controllers
 
             if(publication != null)
             {
-                var options = new JsonSerializerOptions
+
+                var settings = new JsonSerializerSettings
                 {
-                    ReferenceHandler = ReferenceHandler.Preserve,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    TypeNameHandling = TypeNameHandling.All
                 };
 
-                string json = System.Text.Json.JsonSerializer.Serialize(publication, options);
-
-                return Ok(json);
+                return Ok(JsonConvert.SerializeObject(publication, Formatting.Indented, settings));
             }
             return NotFound();
         }
@@ -128,23 +137,16 @@ namespace University.WebApi.Controllers
         public async Task<IActionResult> Upload(UploadMethodologicalPublicationDto publicationDto)
         {
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
-
             var publication = _mapper.Map<MethodologicalPublication>(publicationDto);
 
-            if(publicationDto.AuthorIds.Any())
-            {
-                publication.Authors = new List<Person>();
+            var disciplines = await _appDbContext.Disciplines.Where(d => publicationDto.DisciplineIds.Contains(d.Id)).ToListAsync();
+            publication.Disciplines = new List<Discipline>();
+            publication.Disciplines.AddRange(disciplines);
 
-                foreach (var lecturerId in publicationDto.AuthorIds)
-                {
-                    var lecturer = await _appDbContext.Lecturers.FirstOrDefaultAsync(a => a.Id == lecturerId);
+            var authors = await _appDbContext.Persons.Where(p => publicationDto.AuthorIds.Contains(p.Id)).ToListAsync();
+            publication.Authors = new List<Person>();
+            publication.Authors.AddRange(authors);
 
-                    if (lecturer == null) { return BadRequest(ModelState); }
-
-                    // Add the author to the publication
-                    publication.Authors.Add(lecturer);
-                }
-            }
 
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (userEmail == null) { return NotFound("User not found!"); }
@@ -262,6 +264,29 @@ namespace University.WebApi.Controllers
             };
 
             return Ok(JsonConvert.SerializeObject(publications, Formatting.Indented, settings));
+        }
+
+        [Authorize(Roles = $"{Roles.HeadOfDepartment},{Roles.Lecturer}")]
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var publication = _appDbContext.Publications
+                                    .Include(p => p.Authors) 
+                                    .FirstOrDefault(p => p.PublicationId == id);
+
+            string userEmail = User.FindFirstValue(ClaimTypes.Email) ?? "";
+            ApplicationUser? user = await _userManager.FindByEmailAsync(userEmail);
+
+            if (publication != null && publication.Authors.Any(p => p.ApplicationUserId == user.Id))
+            {
+                _appDbContext.Publications.Remove(publication);
+                await _appDbContext.SaveChangesAsync();
+                return Ok("Publication deleted successfully.");
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

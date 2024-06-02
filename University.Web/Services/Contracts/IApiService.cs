@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using University.WebApi.Dtos.MethodologicalPublicationDto;
 using University.WebApi.Dtos.ScientificPublicationDto;
 using University.WebApi.Dtos.WorkPlanDtos;
+using Models.Models.AdditionalTypes;
 
 namespace University.Web.Services.Contracts
 {
@@ -16,7 +17,7 @@ namespace University.Web.Services.Contracts
         Task<Result<string>> AddPublicationAsync(UploadMethodologicalPublicationDto publicationDto);
         Task<Result<List<LecturerDto>>> GetLecturersAsync();
         Task<Result<Publication>> GetPublicationInfoAsync(int idx);
-        Task<Result<List<PublicationShortDto>>> GetPublicationsAsync(string? searchTerm = null, string? authorName = null, DateTime? startDateFilter = null, DateTime? endDateFilter = null);
+        Task<Result<List<PublicationShortDto>>> GetPublicationsAsync(string? searchTerm = null, string? authorName = null, DateTime? startDateFilter = null, DateTime? endDateFilter = null, int[]? categories = null);
         Task<Result<Lecturer>> GetLecturerAsync(int id);
         Task<Result<List<Plan>>> GetPlansAsync();
         Task<Result<byte[]>> DownloadPlanAsync(int id);
@@ -38,5 +39,7 @@ namespace University.Web.Services.Contracts
         Task PostScientificDissertationAsync(PostScientificDissertationDto publicationDto);
         Task PostScientificPatentAsync(PostScientificPatentDto publicationDto);
         Task PostScientificConferenceThesesAsync(PostScientificConferenceThesesDto publicationDto);
+        Task<LecturerLicense> GetLecturerLicenseInfo(int lecturerId);
+        Task DeletePublication(int id);
     }
 }

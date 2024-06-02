@@ -2,6 +2,7 @@
 @{
     bool authorized = SessionService.isAuthorized;
     var (user, role) = SessionService.GetUser();
+    var cats = (SelectList)ViewBag.Categories;
 }
 <style>
     .publication-title {
@@ -44,11 +45,67 @@
 
         margin-bottom: .3rem;
     }
+
+    .chosen-container-multi {
+        border: none;
+    }
+
+    .chosen-container-multi .chosen-choices {
+        background-image: none;
+        padding: 7px;
+        border: none !important;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .chosen-container-multi .chosen-choices li.search-choice {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        padding-top: 7px;
+        padding-bottom: 7px;
+        padding-left: 10px;
+        padding-right: 26px;
+        border: none;
+        background-image: none;
+    }
+
+    .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+        top: 9px;
+        right: 8px;
+    }
+
+    .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .chosen-container .chosen-drop {
+        border: none !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        margin-top: 3px;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .color-1 .chosen-container-multi .chosen-choices li.search-choice {
+        background-color: #e5e4cc;
+    }
+
+    .color-2 .chosen-container-multi .chosen-choices li.search-choice {
+        background-color: #c7f0db;
+    }
+
+    .color-3 .chosen-container-multi .chosen-choices li.search-choice {
+        background-color: #d3f4ff;
+    }
 </style>
 
 <div class="d-flex justify-content-between">
     <h3>Публікації</h3>
-    @if(authorized)
+    @if(authorized && role != Roles.GuarantorOfSpeciality && role != Roles.EducationDepartment)
     {
         <div class="nav-item dropdown active">
             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Опублікувати</a>
@@ -138,6 +195,10 @@
                                value="@(ViewBag.EndDateFilter == null ? "" : ((DateTime)ViewBag.EndDateFilter).ToString("yyyy-MM-dd"))" />
                     </div>
                 </div>
+                <div class="mt-2">
+                    <label for="categories">Дисципліни:</label>
+                    <select name="categories" asp-items="ViewBag.Categories" multiple class="form-control" data-placeholder="Оберіть дисципліну" id="DisciplinesSelect"></select>
+                </div>
             </div>
         </div>
     </div>
@@ -204,9 +265,24 @@
         });
     });
 </script>
-
+<script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@2.0.1/dist/js/multi-select-tag.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2/build/toastr.min.js" defer></script>
 <script>
+
     $(function () {
+        new MultiSelectTag('DisciplinesSelect', {
+            rounded: true,    // default true
+            shadow: false,      // default false
+            placeholder: 'Пошук',  // default Search...
+            tagColor: {
+                textColor: '#327b2c',
+                borderColor: '#92e681',
+                bgColor: '#eaffe6',
+            },
+            onChange: function (values) {
+                console.log(values)
+            }
+        });
         var getAuthorsUrl = "/Lecturers/GetAuthors"; // Adjust the URL to your actual endpoint
 
         function split(val) {

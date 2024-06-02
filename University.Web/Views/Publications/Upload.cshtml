@@ -1,13 +1,17 @@
 ﻿@model UploadPublication
 
+@{
+    List<Discipline> disciplines = ViewBag.Disciplines;
+}
+
 <h3>Створити публікацію</h3>
 <hr/>
 
-<form asp-controller="Publications" asp-action="Upload" method="post" enctype="multipart/form-data">
+<form asp-controller="Publications" asp-action="upload-web" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-6">
             <div class="form-group">
                 <label asp-for="Title"></label>
                 <input asp-for="Title" class="form-control" />
@@ -16,8 +20,14 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
+                <label asp-for="PublicationType"></label>
+                <select class="form-select" asp-for="PublicationType" asp-items="Html.GetEnumSelectList<PublicationType>()"></select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
                 <label asp-for="PublicationDate"></label>
-                <input asp-for="PublicationDate" class="form-control" />
+                <input asp-for="PublicationDate" class="form-control" type="date"/>
                 <span asp-validation-for="PublicationDate" class="text-danger"></span>
             </div>
         </div>
@@ -34,6 +44,39 @@
         <label asp-for="Description"></label>
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-8">
+            <label asp-for="DisciplinesIds"></label>
+            <select multiple class="form-control" data-placeholder="Оберіть дисципліну" asp-for="DisciplinesIds" id="DisciplinesSelect" required>
+                @foreach (var d in disciplines)
+                {
+                    <option value="@d.Id">@d.Name</option>
+                }
+            </select>
+            <span asp-validation-for="DisciplinesIds" class="text-danger"></span>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="Language"></label>
+                <select class="form-select" asp-for="Language" asp-items="Html.GetEnumSelectList<Language>()"></select>
+                <span asp-validation-for="Language" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="Volume"></label>
+                <input class="form-control" asp-for="Volume" min="1" required />
+                <span asp-validation-for="Volume" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group my-1">
+        <label asp-for="Authors"></label>
+        <input asp-for="Authors" id="Authors" class="form-control" />
+        <span asp-validation-for="Authors" class="text-danger"></span>
     </div>
 
     <div class="form-group">
@@ -57,16 +100,99 @@
         </div>
     </div>
 
-    <div class="form-group my-1">
-        <label asp-for="Authors"></label>
-        <input asp-for="Authors" id="Authors" class="form-control" />
-        <span asp-validation-for="Authors" class="text-danger"></span>
-    </div>
+    
+    
 
     <div class="form-group mt-3">
         <button type="submit" class="btn btn-success w-100 tex">Підтвердити</button>
     </div>
 </form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@2.0.1/dist/js/multi-select-tag.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2/build/toastr.min.js" defer></script>
+
+    <script>
+        new MultiSelectTag('DisciplinesSelect', {
+            rounded: true,    // default true
+            shadow: false,      // default false
+            placeholder: 'Пошук',  // default Search...
+            tagColor: {
+                textColor: '#327b2c',
+                borderColor: '#92e681',
+                bgColor: '#eaffe6',
+            },
+            onChange: function (values) {
+                console.log(values)
+            }
+        });
+
+        var authorsSelectTag = new MultiSelectTag('AuthorsSelect', {
+            rounded: true,    // default true
+            shadow: false,      // default false
+            placeholder: 'Пошук',  // default Search...
+            tagColor: {
+                textColor: '#327b2c',
+                borderColor: '#92e681',
+                bgColor: '#eaffe6',
+            },
+            onChange: function (values) {
+                console.log(values)
+            }
+        });
+
+
+        $(document).ready(function () {
+            $('#addAuthor').click(function () {
+                var firstName = $('#addName').val();
+                var lastName = $('#addSurname').val();
+                var middleName = $('#addMiddleName').val();
+
+                var requestData = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    middleName: middleName
+                };
+
+                $.ajax({
+                    url: 'https://localhost:7249/api/people',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        $('#addAuthorModal').modal('toggle');
+
+                        $('#AuthorsSelect').append($('<option>', {
+                            value: response.id, // Assuming the response contains the ID of the newly added author
+                            text: response.lastName + ' ' + response.firstName + ' ' + response.middleName // Assuming the response contains the first and last name of the newly added author
+                        }));
+
+                        document.querySelector('.mult-select-tag').remove();
+                        new MultiSelectTag('AuthorsSelect', {
+                            rounded: true,    // default true
+                            shadow: false,      // default false
+                            placeholder: 'Пошук',  // default Search...
+                            tagColor: {
+                                textColor: '#327b2c',
+                                borderColor: '#92e681',
+                                bgColor: '#eaffe6',
+                            },
+                            onChange: function (values) {
+                                console.log(values)
+                            }
+                        });
+
+                        toastr.success('Сторонній автор успішно додано!');
+                    },
+                    error: function (xhr, status, error) {
+                        $('#addAuthorModal').modal('toggle');
+                        toastr.error('Виникла помилка: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+}
 
 <script>
     $(function () {

@@ -100,4 +100,14 @@ public class LecturersController : Controller
         return View(publications);
     }
 
+    [HttpGet("license")]
+    public async Task<IActionResult> License(int id)
+    {
+        var result = await apiService.GetPeopleAsync();
+
+        var license = await apiService.GetLecturerLicenseInfo(id);
+
+        return View(license);
+    }
+
 }

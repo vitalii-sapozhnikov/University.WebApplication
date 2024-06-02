@@ -9,6 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 using University.WebApi.Dtos.MethodologicalPublicationDto;
 using University.WebApi.Dtos.ScientificPublicationDto;
 using University.WebApi.Dtos.WorkPlanDtos;
+using System.Net.Http.Json;
+using Models.Models.AdditionalTypes;
+using Azure;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace University.Web.Services
 {
@@ -50,7 +56,8 @@ namespace University.Web.Services
             string? searchTerm = null,
             string? authorName = null,
             DateTime? startDateFilter = null,
-            DateTime? endDateFilter = null)
+            DateTime? endDateFilter = null, 
+            int[]? categories = null)
         {
             var client = GetClient();
 
@@ -76,6 +83,11 @@ namespace University.Web.Services
             if (endDateFilter.HasValue)
             {
                 queryString.Append($"endDateFilter={endDateFilter.Value.ToString("yyyy-MM-dd")}&");
+            }
+
+            if (categories != null)
+            {
+                queryString.Append($"categories={string.Join(",", categories)}&");
             }
 
             // Remove trailing "&" from the queryString
@@ -114,7 +126,11 @@ namespace University.Web.Services
             if (result.IsSuccessStatusCode)
             {
                 var jsonContent = await result.Content.ReadAsStringAsync();
-                var publication = JsonConvert.DeserializeObject<Publication>(jsonContent);
+                var settings = new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.All
+                };
+                var publication = JsonConvert.DeserializeObject<Publication>(jsonContent, settings);
 
                 if (publication != null)
                     return Result<Publication>.Ok(publication);
@@ -156,6 +172,14 @@ namespace University.Web.Services
                 return publications;
             }
             return null;
+        }
+
+        public async Task DeletePublication(int id)
+        {
+            HttpClient client = GetClient();
+            string url = $"api/publications?id={id}";
+            var result = await client.DeleteAsync(url);
+            result.EnsureSuccessStatusCode();
         }
 
 
@@ -469,6 +493,20 @@ namespace University.Web.Services
             var jsonContent = new StringContent(JsonConvert.SerializeObject(publicationDto), Encoding.UTF8, "application/json");
 
             var result = await client.PostAsync("api/ScientificConferenceTheses", jsonContent);
+        }
+
+
+        public async Task<LecturerLicense> GetLecturerLicenseInfo(int lecturerId)
+        {
+            var client = GetClient();
+            var response = await client.GetAsync($"api/Lecturers/license?lectId={lecturerId}");
+
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            var license = JsonConvert.DeserializeObject<LecturerLicense>(content);
+
+            return license;
         }
     }
 

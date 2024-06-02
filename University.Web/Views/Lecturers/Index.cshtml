@@ -1,6 +1,10 @@
 ﻿@using Newtonsoft.Json
 @model Lecturer
 
+@{
+    var(user, role) = SessionService.GetUser();
+    var numberOfColumns = user?.Person?.Id == Model.Id ? 2 : 1;
+}
 
 <style>
     .publication-title {
@@ -21,8 +25,27 @@
         margin-bottom: .3rem;
     }
 </style>
+<style>
+    .icon-button {
+        font-size: 1.1rem;
+        display: block; /* Ensures the anchor tag takes the whole width */
+        text-align: center; /* Centers the icon within the anchor tag */
+    }
 
-<h3>@($"{Model.LastName} {Model.FirstName} {Model.MiddleName}")</h3>
+    .icon-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%; /* Ensures the container takes the full height of the table cell */
+    }
+</style>
+
+<h3>@if (user?.Person?.Id == Model.Id)
+    {
+        <text>Особистий кабінет: </text>
+    } 
+    @($"{Model.LastName} {Model.FirstName} {Model.MiddleName}")</h3>
 <hr/>
 
 <form method="get" asp-controller="Lecturers" asp-action="Index" asp-route-id="@Model.Id">
@@ -56,37 +79,67 @@
 <div class="row mt-3">
     <div class="col-md-9">
         <table id="publicationTable" class="display">
-                <tbody>
-                @foreach (var publication in Model.Publications)
-                {
-                    <tr>
+            @foreach (var publication in Model.Publications)
+            {
+                <tr>
+                    <td>
+                        <div class="py-1">
+                            <div>
+                                <a class="text-dark publication-title"
+                                    asp-controller="Publications"
+                                    asp-action="Index"
+                                    asp-route-id="@publication.PublicationId">
+                                    @publication.Title &mdash; @publication.PublicationDate?.Year.ToString()
+                                </a>
+                            </div>
+                            <div>
+                                <p class="publication-description">@publication.Description</p>
+                            </div>
+                            <div>
+                                @foreach (var keyWord in publication.Keywords)
+                                {
+                                    <span class="badge bg-primary">
+                                        @keyWord
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                    @if(user?.Person?.Id == Model.Id){
                         <td>
-                            <div class="py-1">
-                                <div>
-                                    <a class="text-dark publication-title"
-                                       asp-controller="Publications"
-                                       asp-action="Index"
-                                       asp-route-id="@publication.PublicationId">
-                                        @publication.Title &mdash; @publication.PublicationDate?.Year.ToString()
-                                    </a>
-                                </div>
-                                <div>
-                                    <p class="publication-description">@publication.Description</p>
-                                </div>
-                                <div>
-                                    @foreach (var keyWord in publication.Keywords)
-                                    {
-                                        <span class="badge bg-primary">
-                                            @keyWord
-                                        </span>
-                                    }
-                                </div>
+                            <div class="icon-container">
+                                <a asp-controller="Publications" asp-action="Edit" asp-route-id="@publication.PublicationId" class="btn btn-sm btn-warning my-1 icon-button">
+                                    <i class="fa-solid fa-pen-to-square" style="color: white;"></i>
+                                </a>
+                                <a class="btn btn-sm btn-danger icon-button" data-bs-toggle="modal" data-bs-target="#modal-@publication.PublicationId">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>                                
                             </div>
                         </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="modal-@publication.PublicationId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Видалення публікації</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Ви впевнені, що хочете видалити @publication.Title?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Вийти</button>
+                                        <a type="button" asp-controller="Publications" asp-action="DeletePub" asp-route-id="@publication.PublicationId" class="btn btn-danger">Видалити</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                </tr>
+            }
+        </table>
     </div>
     <div class="col-md-3">
         <canvas id="publicationsChart" height="400"></canvas>
@@ -156,7 +209,7 @@
                 "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/uk.json"
             },
             "columns": [
-                null  // Placeholder for the second column
+                @for(int i = 0; i < numberOfColumns; i++){<text>null,</text>}
             ],
             "searching": false,
             "dom": 'lfrtip',

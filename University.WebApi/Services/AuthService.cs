@@ -128,7 +128,10 @@ namespace University.WebApi.Services
 
             if (signInResult)
             {
-                identityUser.Person = _appDbContext.Persons.First(p => p.ApplicationUser == identityUser);
+                try
+                {
+                    identityUser.Person = _appDbContext.Persons.First(p => p.ApplicationUser == identityUser);
+                }catch(Exception ex) { }
                 return (identityUser); // Success
             }
 

@@ -89,8 +89,7 @@ namespace University.WebApi.Controllers
             {
                 var roles = await _authService.GetRole(user.Email);
                 var tokenString = _authService.GenerateTokenString(user, roles.First());
-
-                var userInfo = await _authService.GetUserInfo(user);
+                ApplicationUser userInfo = await _authService.GetUserInfo(user);
 
                 var response = new
                 {

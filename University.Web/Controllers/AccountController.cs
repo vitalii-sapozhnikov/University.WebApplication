@@ -40,7 +40,7 @@ namespace University.Web.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                    ModelState.AddModelError(string.Empty, "Не вірний логін або пароль!");
                 }
             }
 

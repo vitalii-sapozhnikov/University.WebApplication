@@ -14,11 +14,17 @@
                     <table class="table table-striped">
                         <tr>
                             <th>ПІБ</th>
+                            <th>Посада</th>
+                            <th class="text-end">Дія</th>
                         </tr>
                         @foreach (var lect in Model.lecturers.Where(l => l.Departments.Any(d => d.DepartmentId == dep.DepartmentId)))
                         {
                             <tr>
                                 <td>@lect.LastName @lect.FirstName @lect.MiddleName</td>
+                                <td>@lect.AcademicTitle.GetDisplayName()</td>
+                                <td class="text-end">
+                                    <a class="btn btn-success" asp-controller="Lecturers" asp-action="License" asp-route-id="@lect.Id">Ліцензування</a>
+                                </td>
                             </tr>
                         }
                     </table>

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Models.Models;
 using University.WebApi.Dtos.EducationalYearDtos;
+using University.WebApi.Dtos.MethodologicalPublicationDto;
 using University.WebApi.Dtos.PersonDtos;
 using University.WebApi.Dtos.ScientificPublicationDto;
 using University.WebApi.Dtos.WorkPlanDtos;
@@ -19,6 +20,14 @@ namespace University.WebApi.Mapping
             CreateMap<Person, GetPersonDto>();
             CreateMap<GetPersonDto, Person>();
             CreateMap<PostPersonDto, Person>();
+
+            // Methodological publications
+            CreateMap<UploadMethodologicalPublicationDto, MethodologicalPublication>()
+                .ForMember(dest => dest.PublicationDate, opt => opt.MapFrom(src =>
+                    DateTime.SpecifyKind(src.PublicationDate, DateTimeKind.Utc)))
+                .ForMember(dest => dest.CloudStorageGuid, opt => opt.MapFrom(src => 
+                    src.CloudStorageId))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.PublicationType));
 
             // Scientific publications
             CreateMap<PostScientificArticleDto, ScientificArticle>()

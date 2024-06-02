@@ -10,5 +10,8 @@ namespace Models.Models
     {
         public string PatentNo { get; set; }
         public string Issuer { get; set; }
+
+        public override string BibliographicReference =>
+            $"{string.Join(", ", Authors.Select(a => a.ShortName))}, {Title} // Номер патенту: {PatentNo}, {Issuer}, {PublicationDate.Value.Year} - {Volume} с. {(URL != null ? $"- Режим доступу: {URL}" : "")}";
     }
 }

@@ -83,7 +83,7 @@ namespace University.WebApi.Controllers
         }
 
         // GET api/<DisciplinesController>/5
-        [Authorize(Roles = "HeadOfDepartment")]
+        [Authorize(Roles = $"{Roles.HeadOfDepartment},{Roles.GuarantorOfSpeciality}")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {

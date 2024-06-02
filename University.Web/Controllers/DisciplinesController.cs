@@ -16,7 +16,7 @@ namespace University.Web.Controllers
             _apiService = apiService;
         }
 
-        [AuthorizeSession(Roles.HeadOfDepartment)]
+        [AuthorizeSession(Roles.HeadOfDepartment,Roles.GuarantorOfSpeciality)]
         [HttpGet("")]
         public async Task<IActionResult> Index()
         {
@@ -36,7 +36,7 @@ namespace University.Web.Controllers
             return BadRequest();
         }
 
-        [AuthorizeSession(Roles.HeadOfDepartment)]
+        [AuthorizeSession(Roles.HeadOfDepartment,Roles.GuarantorOfSpeciality)]
         [HttpGet("{id}")]
         public async Task<IActionResult> Index(int id)
         {

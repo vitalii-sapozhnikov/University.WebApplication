@@ -8,6 +8,7 @@ using University.WebApi.Dtos.PersonDtos;
 using Models.Roles;
 using University.WebApi.Dtos.MethodologicalPublicationDto;
 using University.WebApi.Dtos.ScientificPublicationDto;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace University.Web.Controllers
 {
@@ -30,23 +31,35 @@ namespace University.Web.Controllers
             string searchTerm,
             string authorName,
             DateTime? startDateFilter,
-            DateTime? endDateFilter)
+            DateTime? endDateFilter, int[]? categories = null)
         {
             var result = await apiService.GetPublicationsAsync(
                 searchTerm,
                 authorName,
                 startDateFilter,
-                endDateFilter);
+                endDateFilter,
+                categories);
 
             if (!result.Success)
             {
                 return BadRequest(result.ErrorMessage);
+            }   
+
+            var disciplines = (await apiService.GetDisciplinesListAsync());
+            var categoriesList = new SelectList(disciplines, "Id", "Name", categories);
+            if(categories != null)
+            {
+                foreach (var item in categoriesList)
+                {
+                    if (categories.Contains(int.Parse(item.Value))) item.Selected = true;
+                }
             }
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.AuthorName = authorName;
             ViewBag.StartDateFilter = startDateFilter;
             ViewBag.EndDateFilter = endDateFilter;
+            ViewBag.Categories = categoriesList;
 
             return View("Index", result.Data);
         }
@@ -59,15 +72,23 @@ namespace University.Web.Controllers
             if(!result.Success)
                 return BadRequest(result.ErrorMessage);
 
+
+
             return View("IndexId", result.Data);
         }
 
 
         [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
         [HttpGet("upload")]
-        public IActionResult UploadPublication() 
+        public async Task<IActionResult> UploadPublication() 
         {
+            var disciplines = (await apiService.GetDisciplinesListAsync());
+            var authors = await apiService.GetPeopleAsync();
             var model = new UploadPublication();
+            model.PublicationDate = DateTime.Now;
+            ViewBag.Disciplines = disciplines;
+            ViewBag.Authors = authors;
+
             return View("Upload", model);
         }
 
@@ -89,11 +110,29 @@ namespace University.Web.Controllers
         }
 
         
-        [HttpPost]
+        [HttpPost("upload-web")]
         public async Task<IActionResult> Upload(UploadPublication model)
         {
             if (!ModelState.IsValid)
+            {
+                var disciplines = (await apiService.GetDisciplinesListAsync());
+                var authors = await apiService.GetPeopleAsync();
+
+                ViewBag.Disciplines = disciplines;
+                ViewBag.Authors = authors;
+
                 return View(model);
+            }
+            if (model.PublicationType == PublicationType.WorkProgramme && model.DisciplinesIds.Count() > 1)
+            {
+                ModelState.AddModelError("DisciplinesIds", "You can only select one discipline for a Work Programme publication.");
+                var disciplines = (await apiService.GetDisciplinesListAsync());
+                var authors = await apiService.GetPeopleAsync();
+
+                ViewBag.Disciplines = disciplines;
+                ViewBag.Authors = authors;
+                return View(model);            
+            }
 
             #region File Upload
             string fileId = await cloudStorageService.UploadAsync(model.File);
@@ -109,7 +148,11 @@ namespace University.Web.Controllers
                 CloudStorageId = fileId,
                 Abstract = model.Abstract,
                 Description = model.Description,
-                Keywords = model.Keywords.Split(',').Select(s => s.Trim().ToLower()).ToArray()
+                PublicationType = model.PublicationType,
+                DisciplineIds = model.DisciplinesIds,
+                Keywords = model.Keywords.Split(',').Select(s => s.Trim().ToLower()).ToArray(),
+                Volume = model.Volume,
+                Language = model.Language
             };
 
             if (model.Authors != null)
@@ -388,10 +431,16 @@ namespace University.Web.Controllers
             return RedirectToAction("All");
         }
 
+        [AuthorizeSession(Roles.Lecturer, Roles.HeadOfDepartment)]
+        [HttpGet("DeletePub")]
+        public async Task<IActionResult> DeletePub(int id)
+        {
+            await apiService.DeletePublication(id);
+            return RedirectToAction("Index", "Lecturers", new { id = sessionService.GetUser().user.Person.Id });
+        }
 
 
 
-
-    }   
+    }
 
 }

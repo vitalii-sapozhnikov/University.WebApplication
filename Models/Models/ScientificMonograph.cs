@@ -10,5 +10,8 @@ namespace Models.Models
     {
         public string Publisher { get; set; }
         public string ISBN { get; set; }
+
+        public override string BibliographicReference =>
+            $"{string.Join(", ", Authors.Select(a => a.ShortName))}, {Title} // {Publisher}, ISBN: {ISBN} / {PublicationDate.Value.Year}  - {this.Volume} с. {(URL != null ? $"- Режим доступу: {URL}" : "")}";
     }
 }

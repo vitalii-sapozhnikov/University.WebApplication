@@ -14,7 +14,7 @@
         <th>
             Вчене звання
         </th>
-        <th style="width: auto; text-align: center;">
+        <th style="width: auto; text-align: end;">
             Дії
         </th>
     </tr>
@@ -27,9 +27,12 @@
             <td>
                 @lect.AcademicTitle.GetDisplayName()
             </td>
-            <td style="width: 1%; text-align: center;">
-                <a class="btn btn-success btn-sm" asp-controller="Lecturers" asp-action="Index" asp-route-id="@lect.Id">
+            <td style="width:min-content; text-align: end;">
+                <a class="btn btn-success btn-sm mx-3" asp-controller="Lecturers" asp-action="Index" asp-route-id="@lect.Id">
                     <b>Ефективність</b>
+                </a>
+                <a class="btn btn-primary btn-sm" asp-controller="Lecturers" asp-action="License" asp-route-id="@lect.Id">
+                    <b>Ліцензіювання</b>
                 </a>
             </td>
         </tr>

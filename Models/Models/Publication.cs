@@ -27,5 +27,8 @@ namespace Models.Models
 
         // Many to many Disciplines
         public virtual ICollection<Discipline> Disciplines { get; set; }
+
+        [NotMapped]
+        public virtual string BibliographicReference { get; }
     }
 }

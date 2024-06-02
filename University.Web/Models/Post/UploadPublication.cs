@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Models.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -35,5 +36,21 @@ namespace University.Web.Models.Post
 
         [Display(Name = "Дата публікації")]
         public DateTime? PublicationDate { get; set; }
+
+
+        [Display(Name = "Дисципліни")]
+        [Required(ErrorMessage = "Оберіть дисципліни")]
+        public int[] DisciplinesIds { get; set; }
+
+
+        [Display(Name = "Тип")]
+        public PublicationType PublicationType { get; set; }
+
+        [Display(Name = "Обсяг, сторінки")]
+        public int Volume { get; set; }
+
+
+        [Display(Name = "Мова")]
+        public Language Language { get; set; }
     }
 }
