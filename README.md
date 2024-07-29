@@ -46,7 +46,7 @@ An ER diagram showing the structure of the model of this information system is s
 ![image](https://github.com/user-attachments/assets/7144b994-3c32-425d-96e1-0a058a17e76c)
 
 ## The following UML diagram describes the interaction of a WebAPI with the database.
-![image](https://github.com/user-attachments/assets/fcc1eb52-5099-4ef3-8728-7609a065f240)
+<img src="https://github.com/user-attachments/assets/fcc1eb52-5099-4ef3-8728-7609a065f240" width=500>
 
 
 ## Webpages hierarchy
