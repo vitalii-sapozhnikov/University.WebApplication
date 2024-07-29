@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /University.WebApi/appsettings.json
 /University.Web/appsettings.json
+/University.Web/client_secret_1025282072388-4e14opbbg5j24qh35i3ln7hsno5lfvcm.apps.googleusercontent.com.json
+/University.Web/client_secret_1025282072388-n9s9qjbmsa8m3008o824ee74d9lobu31.apps.googleusercontent.com.json
